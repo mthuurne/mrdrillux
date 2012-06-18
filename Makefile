@@ -12,10 +12,16 @@ TOOLCHAIN_dingux:=/opt/opendingux-toolchain
 EXEEXT_native:=
 EXEEXT_dingux:=.dge
 
+# Tile size for each platform.
+# Use size 24 for 320x240 and size 48 for 640x480.
+RES_native:=48
+RES_dingux:=24
+
 # Pick the definitions for the active platform.
 CC:=$(CC_$(PLATFORM))
 TOOLCHAIN:=$(TOOLCHAIN_$(PLATFORM))
 EXEEXT:=$(EXEEXT_$(PLATFORM))
+RES:=$(RES_$(PLATFORM))
 
 CFLAGS:=-O2 -g
 LDFLAGS:=
@@ -46,9 +52,9 @@ dist: $(BINARY)
 	cp dat/* $(OUTDIR)/dist
 	cp gfx/*.txt $(OUTDIR)/dist
 	cp gfx/*.bmp $(OUTDIR)/dist
-	cp gfx/susumi/*.bmp $(OUTDIR)/dist/susumi
-	cp gfx/susumi/*.txt $(OUTDIR)/dist/susumi
-	cp gfx/system/*.bmp $(OUTDIR)/dist/system/bmp
+	cp gfx/susumi-$(RES)/*.bmp $(OUTDIR)/dist/susumi
+	cp gfx/susumi-$(RES)/*.txt $(OUTDIR)/dist/susumi
+	cp gfx/system-$(RES)/*.bmp $(OUTDIR)/dist/system/bmp
 	cp snd/*.txt $(OUTDIR)/dist
 	cp snd/wav/*wav $(OUTDIR)/dist/system/wav
 
