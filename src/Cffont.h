@@ -51,4 +51,4 @@ typedef struct{
 
 
 
-#endif _sdlbmpfastfont_h
+#endif
