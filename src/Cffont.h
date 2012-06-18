@@ -36,19 +36,4 @@ int CffontBlitxy(Cffont *,char *,SDL_Surface *,int ,int );
 void CffontSetupFromFireworks(Cffont*,int);
 
 
-#define MAXTEXTLINE 25
-
-typedef struct{
-
-	SDL_Surface *screen;//pointer to master screen
-	SDL_Surface *lines[MAXTEXTLINE+1];
-	Cffont *font;
-	//cursor
-	int x;
-	int y;
-
-}CSDLCons;
-
-
-
 #endif
