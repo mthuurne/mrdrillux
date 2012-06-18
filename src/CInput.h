@@ -24,14 +24,14 @@ structure for joystick and key input
 #define MAX_BUTTONS		8
 
 typedef struct{
-	
+
 	int button[MAX_BUTTONS];
 	int hold[MAX_BUTTONS];
 	int repeat[MAX_BUTTONS];
 	SDL_Joystick *joystick;
 	int min_axis;
-	
-	
+
+
 }CInput;
 
 

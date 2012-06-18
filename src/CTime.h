@@ -22,19 +22,19 @@ do{
 
 //ŽžŠÔ
 typedef struct{
-	
+
 	Uint32 interval;
 	Uint32 nowtime;
 	Uint32 lasttime;
 	Uint32 under;
 	int isDelay;
 	Uint32 clock;//milisecond.
-	
+
 	Uint32 fpsclock;
 	Uint32 framecount;
 	Uint32 fps;
-	
-	
+
+
 }CTime;
 
 int CTimeReset(CTime *);

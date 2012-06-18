@@ -16,13 +16,13 @@ text put structures for SDL
 #define N_ASCII 128
 
 typedef struct{
-	
+
 	SDL_Surface *font;
 	SDL_Rect fontarea[N_ASCII];
 	int width;
 	int height;
 	int isTransparent;
-	
+
 }Cffont;
 
 
@@ -39,14 +39,14 @@ void CffontSetupFromFireworks(Cffont*,int);
 #define MAXTEXTLINE 25
 
 typedef struct{
-	
+
 	SDL_Surface *screen;//pointer to master screen
 	SDL_Surface *lines[MAXTEXTLINE+1];
 	Cffont *font;
 	//cursor
 	int x;
 	int y;
-	
+
 }CSDLCons;
 
 

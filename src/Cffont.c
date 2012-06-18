@@ -8,11 +8,11 @@ text put structures for SDL
 #include "SDL.h"
 /*private funcs for init*/
 void CffontSetup(Cffont *this){
-	
+
 	int i;
 	int x,y;
 	SDL_Rect *w;
-	
+
 printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
 	x=0;
 	y=0;
@@ -28,20 +28,20 @@ printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
 			y+=this->height;
 		}
 	}
-	
+
 }
 
 void CffontSetupFromFireworks(Cffont *this,int size){
-	
+
 	int i;
 	int x,y;
 	SDL_Rect *w;
 	int space_x=16,space_y=16,plus=96;
-	
+
 	if(size==16){space_x=15;space_y=15;plus=96;}
 	if(size==32){space_x=7;space_y=7;plus=64;}
-	
-	
+
+
 printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
 	x=0;
 	y=0;
@@ -49,14 +49,14 @@ printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
 	for(i=0;i<N_ASCII;++i,++w){
 		w->w=this->width;
 		w->h=this->height;
-		
+
 		if(i<33||i>33+plus){
-			
+
 			w->x=space_x*this->width;
 			w->y=space_y*this->height;
-			
+
 		}else{
-		
+
 			w->x=x;
 			w->y=y;
 			y+=this->height;
@@ -66,7 +66,7 @@ printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
 			}
 		}
 	}
-	
+
 }
 
 //16x16 bitmaped font loading func
@@ -79,10 +79,10 @@ Cffont* CffontInitDefault32(char *filename){
 }
 
 Cffont* CffontInit(char *filename,int width,int height,int r,int g,int b){
-	
+
 	Cffont *p;
 	Uint32 color;
-	
+
 	p=(Cffont *)malloc(sizeof(Cffont));
 	if(NULL==p){
 		fprintf(stderr,"ERROR:no memory at CffontInit\n");
@@ -101,9 +101,9 @@ Cffont* CffontInit(char *filename,int width,int height,int r,int g,int b){
 	p->height=height;
 //	SDL_DisplayFormat(p->font);
 	CffontSetupFromFireworks(p,p->width);
-	
+
 	return(p);
-	
+
 
 }
 

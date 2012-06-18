@@ -35,26 +35,26 @@ typedef struct{
 #define	STAGE_HEIGHT	100
 
 typedef struct{
-	
+
 	//stage
 	TBlockState area[STAGE_WIDTH][STAGE_HEIGHT];
-	
+
 #define	BLOCK_NUM 5
 	CBmps* blocks;
-	
-	
+
+
 	//
 	int screen_height;
 	int screen_width;
-	
+
 	int level;
-	
-	
+
+
 	//
 	Sint16	stage_x;
 	Sint16	stage_y;
-	
-	
+
+
 }TStage;
 
 */

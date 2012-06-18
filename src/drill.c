@@ -77,18 +77,18 @@ typedef struct{
 	int lefttime;// for prefall wait time
 	int done;
 	int done_sub;
-	
+
 	int unsetlock;
-	
+
 	int destroycount;//for X block
-	
+
 	int shape;//for soft blocks
-	
+
 	int extinguishingframe;
-	
-	
+
+
 	int player_dug;
-	
+
 }TBlockState;
 
 #define GAME_STAGE_WIDTH 9
@@ -139,7 +139,7 @@ typedef struct{
 	int time[SCOREMEMBER+1];
 	int depth[SCOREMEMBER+1];
 	int score[SCOREMEMBER+1];
-	
+
 }THighScore;
 
 THighScore highscoredata;
@@ -153,12 +153,12 @@ char *fasttimefile="drilltime.scr";
 
 
 typedef struct{
-	
+
 	int x;
 	int y;
 	SDL_Surface *bmp;
 	int clock;
-	
+
 }CTileScroll;
 
 CTileScroll tscroll;
@@ -328,18 +328,18 @@ void set_shape(void);
 
 
 main(int argc,char **argv){
-	
+
 	int done=0;
-	
+
 	load_setting();
-	
+
 	initialize();
 	load_graphic();
-	
-	
+
+
 	THighScoreLoad(&highscoredata,scorefile);
 	THighScoreLoad(&fasttimedata,fasttimefile);
-	
+
 
 	/*
 	draw();
@@ -349,15 +349,15 @@ main(int argc,char **argv){
 	do{
 		CWavsPlayMusicStyle(wavs,0);
 		if(!title())break;
-		
+
 		CWavsPlayMusicStyle(wavs,1);
-		
-		
+
+
 		game_ready();
 		if(!mainloop())done = 1;
 	}while(!done);
-	
-	
+
+
 	THighScoreSave(&highscoredata,scorefile);
 	THighScoreSave(&fasttimedata,fasttimefile);
 	finalize();
@@ -365,7 +365,7 @@ main(int argc,char **argv){
 
 
 void load_setting(void){
-	
+
 	FILE *fp;
 	char buf[4096];
 	char *ignore="#\r\n";
@@ -377,8 +377,8 @@ void load_setting(void){
 		fprintf(stderr,"ERROR:cant open %s\n",inifile);
 		return;
 	}
-	
-	
+
+
 	setting_fullscreen=0;
 	strcpy(setting_bitmapdir,"./system/bmp/");
 	setting_defaultFPS=60;
@@ -395,10 +395,10 @@ void load_setting(void){
 	do{
 		if(NULL==(fgets(buf,4096,fp)))break;
 		if(NULL!=strchr(ignore,*buf))continue;
-		
+
 		p=strtok(buf,"\t\r\t\n #");
 		q=strtok(NULL,"\t\r\t\n #");
-		
+
 		if(!strcmp(p,"FULLSCREEN")){
 			if(!strcmp(q,"YES"))setting_fullscreen=1;else setting_fullscreen=0;
 		}
@@ -432,7 +432,7 @@ void load_setting(void){
 		if(!strcmp(p,"JOY_ENABLED")){
 			if(!strcmp(q,"YES"))setting_joyenabled=1;else setting_joyenabled=0;
 		}
-		
+
 		if(!strcmp(p,"JOYSTICK_NUMBER")){
 			if(q)setting_joysticknumber=atoi(q);
 		}
@@ -452,34 +452,34 @@ void load_setting(void){
 		}
 	}while(1);
 	fclose(fp);
-	
-	
+
+
 }
 
 void gameover(void){
-	
-	
+
+
 	my_time=1000000;//for no clear time
 	printf("%d %d %d\n",my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time);
-	
+
 	if(init_nameentry(my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time) < 0);else
 		nameentry();
-	
-	
+
+
 }
 void gameclear(void){
-	
+
 	printf("%d %d %d\n",my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time);
-	
+
 	if(init_nameentry(my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time) < 0);else
 		nameentry();
-	
-	
+
+
 }
 
 /*死の判定、非0で死*/
 int atarihantei(void){
-	
+
 	int mapx,mapy;
 	TBlockState *p;
 	int deltax,deltay;
@@ -498,9 +498,9 @@ int atarihantei(void){
 		got_air++;
 		scorerest+=got_air*10;
 		scoreplus+=got_air/2+1;
-		
+
 		CWavsPlay(wavs,11);
-		
+
 	}else
 	if(p->type!=NO_BLOCK && p->state!=BLOCKSTATE_EXTINGUISHING && p->state!=BLOCKSTATE_EXTINGUISHED){
 		if(p->left<24){
@@ -508,9 +508,9 @@ int atarihantei(void){
 		return 1;
 		}
 	}else
-	if(mapx>0 && my_x%48==24 && gamestage[mapx-1][mapy].type!=NO_BLOCK && 
-		gamestage[mapx-1][mapy].type!=AIR_BLOCK && 
-		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHING && 
+	if(mapx>0 && my_x%48==24 && gamestage[mapx-1][mapy].type!=NO_BLOCK &&
+		gamestage[mapx-1][mapy].type!=AIR_BLOCK &&
+		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHING &&
 		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHED){
 		if(p->left<24){
 		my_dead=1;my_deadcount=0;vx=0;
@@ -519,16 +519,16 @@ int atarihantei(void){
 	}
 	if(my_air==0){my_dead=1;my_deadcount=0;vx=0;return 2;}
 	//補正
-	if(deltay==0 && deltax<=20 && mapx<STAGE_WIDTH && 
+	if(deltay==0 && deltax<=20 && mapx<STAGE_WIDTH &&
 		gamestage[mapx+1][mapy].type!=NO_BLOCK &&
 		gamestage[mapx+1][mapy].type!=AIR_BLOCK &&
 		gamestage[mapx+1][mapy].state!=BLOCKSTATE_EXTINGUISHING &&
 		gamestage[mapx+1][mapy].state!=BLOCKSTATE_EXTINGUISHED
-		
-		
+
+
 		){
-		
-		
+
+
 		my_x=mapx*48;
 		if(deltax>12){
 			penaltyframe=PENALTY_FRAMES;
@@ -537,17 +537,17 @@ int atarihantei(void){
 				else
 				penaltybgnum=34;
 		}
-		
+
 	}
 	if(deltay==0 && deltax>=28 && mapx>0 && gamestage[mapx-1][mapy].type!=NO_BLOCK &&
 		gamestage[mapx-1][mapy].type!=AIR_BLOCK &&
 		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHING &&
 		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHED
-		
+
 		){
-		
-		
-		
+
+
+
 			my_x=(mapx)*48;
 			if(deltax<36){
 			penaltyframe=PENALTY_FRAMES;
@@ -558,8 +558,8 @@ int atarihantei(void){
 		}
 
 	}
-	
-	
+
+
 	return 0;
 }
 
@@ -567,7 +567,7 @@ int atarihantei(void){
 
 
 void other_move(void){
-	
+
 	if(my_y>=(STAGE_START_Y-1)*48)airdowncount++;
 	if(airdowncount>airdownspeed){
 		airdowncount=0;
@@ -579,11 +579,11 @@ void other_move(void){
 	}
 	if(my_air<=0)my_air=0;
 	if(my_air>=100)my_air=100;
-	
-	
+
+
 	if(scoreplus>0){
 		if(scorerest>scoreplus){
-			
+
 			my_score+=scoreplus;
 			scorerest-=scoreplus;
 		}else{
@@ -592,8 +592,8 @@ void other_move(void){
 			scoreplus=0;
 		}
 	}
-	
-	
+
+
 }
 
 int move(void){
@@ -601,19 +601,19 @@ int move(void){
 	int digx,digy;
 	Uint8 *keys;
 	TBlockState *p,*q;
-	
+
 //	int joy_up=0,joy_down=0,joy_left=0,joy_right=0,joy_space=0,joy_cancel=0;
-	
+
 	//if(erase_block());//CWavsPlay(wavs,12);
 	erase_block();
 	erase_check();
-	
+
 	if(dig_graphic){
 		dig_graphic++;
 		if(dig_graphic>=9)dig_graphic=0;
 	}
-	
-	
+
+
 	if(climbing){
 		my_y+=vy;
 		if(my_y<0)my_y=0;
@@ -630,11 +630,11 @@ int move(void){
 	vy=0;
 	dig=0;
 		if(!my_dead && !my_clear && penaltyframe==0){
-			
+
 			CInputUpdate(gameinput,0);
 		}else{
 			CInputUpdate(gameinput,1);
-			
+
 		}
 //			keys = SDL_GetKeyState(NULL);
 /*
@@ -649,7 +649,7 @@ int move(void){
 		if ( gameinput->button[BUTTON_DOWN]) {direction=DIR_DOWN;}
 		if ( gameinput->button[BUTTON_RIGHT]) {vx= WALKSPEED;direction=DIR_RIGHT;}
 		if ( gameinput->button[BUTTON_LEFT]) {vx=-WALKSPEED;direction=DIR_LEFT;}
-		
+
 		if ( gameinput->button[BUTTON_0] && direction!=DIR_NONE && my_y%48==0){
 
 			if(dig_repeat)dig=0;else{
@@ -657,27 +657,27 @@ int move(void){
 				dig_graphic=1;
 				dig_repeat=1;
 			}
-			
+
 		}else{
 			dig_repeat=0;
 		}
 	}
 	if(vx==0)repeat_x=0;
-	
+
 	if(penaltyframe>0){
 		penaltyframe--;
 	}
-	
-	
+
+
 	mapx=my_x/48;
 	mapy=my_y/48;
 	if(my_x%48>=24)mapx++;
 	if(my_y%48>=24)mapy++;
 	p=&gamestage[mapx][mapy];
 	q=&gamestage[mapx][mapy+1];
-	
+
 	if(my_y%48==0){
-		
+
 		if(q->type==NO_BLOCK||q->type==AIR_BLOCK||q->state==BLOCKSTATE_EXTINGUISHING){
 			vx=0;
 			vy=WALKSPEED_Y;
@@ -691,21 +691,21 @@ int move(void){
 		dig=0;
 		penaltyframe=0;
 	}
-	
-	
+
+
 	if(my_x%48 >=12 &&my_x%48 < 36){
 		if(direction==DIR_RIGHT||direction==DIR_LEFT)dig=0;
 	}
-	
+
 	if(vx!=0 && my_x%48==0){
-		
+
 		mapx=my_x/48;
 		mapy=my_y/48;
-		
+
 		if(vx>0)mapx++;
 		if(vx<0)mapx--;
-		
-		if(mapx<0)vx=0; else 
+
+		if(mapx<0)vx=0; else
 		if(mapx>=STAGE_WIDTH)vx=0; else
 		if(gamestage[mapx][mapy].type==AIR_BLOCK){
 			;
@@ -714,24 +714,24 @@ int move(void){
 			gamestage[mapx][mapy].state==BLOCKSTATE_EXTINGUISHED){
 			;
 		}else if(gamestage[mapx][mapy].type!=NO_BLOCK){
-			
+
 			if(gamestage[my_x/48][mapy-1].type==NO_BLOCK && gamestage[my_x/48][mapy-1].state!=BLOCKSTATE_EXTINGUISHING
 			 && (gamestage[mapx][mapy-1].type==NO_BLOCK||gamestage[mapx][mapy-1].type==AIR_BLOCK)){
 				repeat_x+=vx;
 				if(repeat_x>WALKSPEED*setting_climbwait||repeat_x<-WALKSPEED*setting_climbwait){
 					climbing=1;
-					
+
 					vy=-WALKSPEED_Y;
 				}else vx=0;
 			}else vx=0;
-			
+
 		}
-		
+
 	}
-	
-	
+
+
 	if(dig){
-		
+
 		digx=my_x/48;
 		if(my_x%48>=24)digx++;
 		digy=my_y/48;
@@ -751,11 +751,11 @@ int move(void){
 		}
 		destroyed=0;
 		if(digx<0 || digx>=STAGE_WIDTH || digy<0 || digy>=GAME_STAGE_HEIGHT);else{
-			if(gamestage[digx][digy].type!=NO_BLOCK && 
+			if(gamestage[digx][digy].type!=NO_BLOCK &&
 			gamestage[digx][digy].state!=BLOCKSTATE_FALLING &&
 			gamestage[digx][digy].state!=BLOCKSTATE_EXTINGUISHING &&
 			gamestage[digx][digy].state!=BLOCKSTATE_EXTINGUISHED
-			
+
 			){
 				if(gamestage[digx][digy].type==CLEAR_BLOCK){
 					stage_clear();
@@ -766,20 +766,20 @@ int move(void){
 				}
 			}
 		}
-		
+
 	}
-	
+
 	if(my_y<0)vy=1;
-	
+
 	if(vx!=0)movingframe++;else movingframe=0;
 	if(!climbing)my_x+=vx;
 	if(vy>0)fallingframe++;else fallingframe=0;
 	my_y+=vy;
-	
+
 	if(my_x<0)my_x=0;
 	if(my_y<0)my_y=0;
-	
-	
+
+
 
 
 
@@ -787,16 +787,16 @@ int move(void){
 	blockprocess();
 
 
-	
+
 }
 
 int keyread(void){
-	
+
 	SDL_Event ev;
 	static int screennumber=0;
 	SDLKey *key;
 	char buf[1000];
-	
+
 	while(SDL_PollEvent(&ev)){
 		switch(ev.type){
 			case SDL_QUIT:
@@ -806,28 +806,28 @@ int keyread(void){
 			break;
 			case SDL_KEYDOWN: {
 				key=&(ev.key.keysym.sym);
-				
+
 				if(*key==293){//F12
-					
+
 					sprintf(buf,"screenshot%04d.bmp",screennumber++);
 					if(screennumber>9999)screennumber=0;
 					SDL_SaveBMP(screen,buf);
-					
+
 				}
-				
+
 				if(*key==27){//ESC
-					
+
 					return 1;
 				}
-				
+
 			}break;
 
 		}
 	}
-	
-	
+
+
 	return 0;
-	
+
 }
 
 void drawback(void){
@@ -838,34 +838,34 @@ void drawback(void){
 }
 
 int mainloop(){
-	
+
 	int y;
-	
+
 	char buf[4096];
 	CTimeChangeFPS(&gametime,my_fps);
-	
+
 	set_shape();
-	
+
 	do{
 	if(my_y==(STAGE_START_Y-1)*48)CTimeReset(&gametime);
 	set_shape();
 		if(keyread())return 0;
-		
+
 		if(lap_showing){
-			
+
 			lapcount++;
 			if(lapcount>300)lap_showing=0;
-			
+
 		}
 		if(airminus){
-			
+
 			airminuscount++;
 			if(airminuscount>80)airminus=0;
-			
+
 		}
-		
+
 		if(my_dead){
-			
+
 			my_deadcount++;
 			if(my_deadcount>250){
 				gameover();
@@ -873,43 +873,43 @@ int mainloop(){
 			}
 		}
 		if(my_clear){
-			
+
 			my_clearcount++;
 			if(my_clearcount>300){
 				gameclear();
 				break;
 			}
 		}
-		
+
 		move();
 		other_move();
 		if(!my_dead && !my_clear)atarihantei();
-		
+
 		if(!gametime.isDelay){
-			
+
 //			SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));
 			drawback();
 			draw();
 			draw_me();
-			
+
 			draw_other();
-			
+
 			drawhanabi();
-			
+
 			draw_screen();
 			draw_air();
-			
+
 			y=my_depth*100+my_y/48-STAGE_START_Y+1;
-			
+
 			sprintf(buf,"%4d m.",y<0?0:y);
 			CffontBlitxy(font,buf,screen,500,100);
-			
+
 			sprintf(buf,"%6d0",my_score);
 			CffontBlitxy(font,buf,screen,480,220);
-			
+
 			sprintf(buf,"%3d%%",my_air);
 			CffontBlitxy(font,buf,screen,500,328);
-			
+
 			SDL_Flip(screen);
 //			SDL_UpdateRect(screen,0,0,0,0);
 		}
@@ -919,66 +919,66 @@ int mainloop(){
 }
 
 void draw_other(void){
-	
+
 	int gy;
-	
+
 	static frame=0;
 	frame++;
-	
+
 	if(my_dead==1){
-		
+
 		if(my_deadcount>20)	CBmpsBlit(cbmps_character,screen,70,61,140);
 	}
 	if(my_clear==1){
-		
+
 		if(my_clearcount>20)	CBmpsBlit(cbmps_character,screen,72,61,140);
 	}
 	if(lap_showing){
-		
+
 		if(lapcount%40<25)CffontBlitxy(font,lapstring,screen,0,0);
 
 	}
-	
+
 	if(my_y>48*90){
 		//draw
 		gy=102*48-my_y;
 		CBmpsBlit(cbmps_character,screen,120+my_depth,66,gy+20+48);
 	}
-	
+
 	if(my_air<25 && (frame%12/6)==0)
 		CBmpsBlit(cbmps_character,screen,111,66,50);
-		
-		
+
+
 	if(airminus){
-		
+
 		CBmpsBlit(cbmps_character,screen,110,116,320);
 
 	}
-	
-	
-	
-	
+
+
+
+
 }
 void draw_air(void){
-	
+
 	SDL_Rect dest={486,320,100,32};
 	SDL_Rect src={0,0,100,32};
-	
+
 	if(my_air<=0)return;
-	
+
 	src.w=my_air;
 	dest.w=my_air;
-	
+
 	SDL_BlitSurface(cbmps_character->bmp[103],&src,screen,&dest);
-	
+
 }
 
 void draw_me(void){
-	
+
 //	CBmpsBlit(cbmps_character,screen,0,my_x*48,3*48);
 	int i,j;
-	
-	
+
+
 	switch(direction){
 		case DIR_RIGHT:i=30;break;
 		case DIR_LEFT:i=40;break;
@@ -991,67 +991,67 @@ void draw_me(void){
 		i+=j;
 		i+=5;
 	}
-	
-	
+
+
 	i+=dig_graphic/3;//frameeach
 	if(penaltyframe>0)i=penaltybgnum;
-	
+
 	if(fallingframe>20){
-		
+
 		i=110+(fallingframe%12)/6;
 	}
-	
-	
+
+
 	if(my_dead==1){
 		i=100;
 		if(my_deadcount>30)i=101;
 	}
-	
+
 //	CBmpsBlit(cbmps_character,screen,i,my_x,4*48);
 	CBmpsBlit(playerbmps,screen,i,my_x-12,4*48-12);
-	
+
 }
 
 void draw_screen(void){
-	
+
 	CBmpsBlit(cbmps_character,screen,100,432,0);
 //	CBmpsBlit(cbmps_character,screen,101,0,432);
-	
+
 }
 
 void stage_clear(void){
-	
+
 	int colors[]={4,3,4,4,2,4,3,3,4,4,1};
 //	int colors[]={1,1,1,1,1,4,3,2,3,4,1};
 //	int percent[]={50,52,54,56,58,60,63,64,66,68,10};
 	int percent[]={50,55,60,65,30,65,70,75,80,80,10};
 	int blockstyle[]={1,3,3,4,1,4,4,3,4,4,1};
-	
+
 	int i,x,y;
-	
+
 	for(i=0,y=my_y/48-4;i<9;i++,y++)
 	for(x=0;x<9;x++){
 		if(gamestage[x][y].type!=NO_BLOCK)hanabiset(x,i-3,15);
 	}
-	
+
 	my_depth++;
 	if(my_depth>=10){my_clear=1;my_clearcount=0;}
 	set_stage(colors[my_depth],percent[my_depth],blockstyle[my_depth]);
 	climbing=0;
-	
-	
-	
+
+
+
 	my_y=-2*48;
 	airdownspeed-=setting_airdownspeed;
 	airdowncount=0;
 	scorerest+=my_depth*100;
 	scoreplus+=my_depth*5;
 	my_fps+=setting_fpsincreasespeed;
-	
+
 	my_time+=gametime.clock/10;
-	
+
 	fallingframe=20;
-	
+
 	sprintf(lapstring,"%2d00m Passing %02d'%02d'%02d",
 		my_depth,
 		gametime.clock/6000/10,
@@ -1066,7 +1066,7 @@ void stage_clear(void){
 }
 
 void game_ready(void){
-	
+
 	my_x=4*48;
 //	my_y=(STAGE_START_Y-1)*48;
 //	my_y=0;
@@ -1077,7 +1077,7 @@ void game_ready(void){
 
 	set_stage_startingpoint();
 	direction=DIR_DOWN;
-	
+
 	climbing=0;
 	airdownspeed=setting_airdecreasewait;
 	airdowncount=0;
@@ -1095,11 +1095,11 @@ void game_ready(void){
 	my_clearcount=0;
 	my_fps=setting_defaultFPS;
 	my_time=0;
-	
+
 	lap_showing=0;
-	
+
 	dig_graphic=0;
-	
+
 	penaltybgnum=0;
 	penaltyframe=0;
 	fallingframe=60;
@@ -1108,14 +1108,14 @@ void game_ready(void){
 }
 
 void initialize(void){
-	
+
 	srand(time(NULL));
-	
+
 	if(setting_fullscreen)
 		screen=CScreenInitDefaultHW();
 	else
 		screen=CScreenInitDefault();
-	
+
 	cbmps_blocks=CBmpsInit(BLOCK_NUM);
 	cbmps_character=CBmpsInit(CHARACTER_NUM);
 	cbmps_other=CBmpsInit(OTHER_GRAPHICS_NUM);
@@ -1127,51 +1127,51 @@ void initialize(void){
 
 
 	font=CffontInitDefault16("engrave16.bmp");
-	
+
 	CAudioInitDefault();
 	wavs=CWavsInit(WAVMAX);
-	
-	joy_init();
-	
 
-	
-	
+	joy_init();
+
+
+
+
 }
 
 void finalize(void){
-	
+
 	CBmpsFree(cbmps_blocks);
 	CBmpsFree(cbmps_character);
 	CBmpsFree(cbmps_other);
-	
-	
+
+
 	CBmpsFree(playerbmps);
 	playerbmps=NULL;
-	
-	
+
+
 	CffontFree(font);
-	
+
 	CWavsFree(wavs);
 	CAudioClose();
 	joy_final();
-	
+
 }
 
 
 //and sound
 void load_graphic(void){
-	
+
 	char filename[1024];
-	
+
 	CBmpsLoadFromFileWithDir(cbmps_blocks,blockfile,setting_bitmapdir);
 	CBmpsLoadFromFileWithDir(cbmps_character,characterfile,setting_bitmapdir);
 	CBmpsLoadFromFileWithDir(cbmps_other,otherfile,setting_bitmapdir);
-	
-	
+
+
 	sprintf(filename,"%s%s",setting_playerdir,playerbmpsfile);
 	CBmpsLoadFromFileWithDir(playerbmps,filename,setting_playerdir);
-	
-	
+
+
 	if(setting_fullscreen){
 
 		CBmpsConvert(cbmps_blocks);
@@ -1182,20 +1182,20 @@ void load_graphic(void){
 	tscroll.x=0;
 	tscroll.y=0;
 	tscroll.clock=0;
-	
-	
+
+
 	CWavsLoadFromFileWithDir(wavs,wavfile,wavdir);
-	
-	
+
+
 }
 
 
 void set_stage_startingpoint(void){
-	
+
 	int i;
 	int num_xy;
 	TBlockState *p;
-	
+
 	const struct{
 		int x;
 		int y;
@@ -1208,7 +1208,7 @@ void set_stage_startingpoint(void){
 		{0,4,0},{1,4,0},{2,4,0},{3,4,0},{4,4,0},{5,4,0},{6,4,0},{7,4,0},{8,4,0},
 	};
 	num_xy=sizeof(xy)/sizeof(xy[0]);
-	
+
 	for(i=0;i<num_xy;++i){
 		p=&(gamestage[xy[i].x][xy[i].y+STAGE_START_Y]);
 		p->type=xy[i].n;
@@ -1218,16 +1218,16 @@ void set_stage_startingpoint(void){
 
 }
 void set_stage(int number,int percentage,int blockstyle){
-	
+
 	int x,y,i;
 	TBlockState *p;
 	int range;
-	
+
 	/*通常のブロックを敷き詰める*/
 	for(y=0;y<GAME_STAGE_HEIGHT;++y){
 		for(x=0;x<GAME_STAGE_WIDTH;++x){
 			p=&(gamestage[x][y]);
-			
+
 			p->type=((double)rand()/RAND_MAX)*number;
 			if(p->type>=4)p->type=0;
 			p->destroycount=0;
@@ -1239,12 +1239,12 @@ void set_stage(int number,int percentage,int blockstyle){
 	}
 	/*硬いブロックをばら撒く*/
 	for(y=10;y<GAME_STAGE_HEIGHT-6;++y){
-		
+
 		if(((double)rand()/RAND_MAX)*100 > percentage)continue;
 		range=((double)rand()/RAND_MAX)*4;
-		
+
 		x=((double)rand()/RAND_MAX)*GAME_STAGE_WIDTH;
-		
+
 		while(range>0){
 			range--;
 			if(x+range>=GAME_STAGE_WIDTH)continue;
@@ -1256,7 +1256,7 @@ void set_stage(int number,int percentage,int blockstyle){
 			p->player_dug=0;
 		}
 	}
-	
+
 	/*airの設置及び周りに硬いブロックを配置*/
 	for(y=11;y<GAME_STAGE_HEIGHT-10;y+=(setting_airinterval+my_depth)){
 		x=((double)rand()/RAND_MAX)*(GAME_STAGE_WIDTH-2)+1;
@@ -1265,49 +1265,49 @@ void set_stage(int number,int percentage,int blockstyle){
 		p->state=BLOCKSTATE_NONE;
 		p->destroycount=0;
 		//添え字チェックはしなくても良いようにAirを配置
-		
+
 		if(blockstyle==4)gamestage[x-1][y].type=HARD_BLOCK;
 		if(blockstyle==4)gamestage[x+1][y].type=HARD_BLOCK;
 		if(blockstyle==4||blockstyle==1||blockstyle==3)gamestage[x][y-1].type=HARD_BLOCK;
 		if(blockstyle==4||blockstyle==2||blockstyle==3)gamestage[x][y+1].type=HARD_BLOCK;
-		
-		
-		
+
+
+
 	}
-	
+
 	/*クリアブロックを配置*/
 	for(y=95+STAGE_START_Y;y<100+STAGE_START_Y;++y){
 		for(x=0;x<GAME_STAGE_WIDTH;++x){
 			p=&(gamestage[x][y]);
-			
+
 			p->type=CLEAR_BLOCK;
 			p->state=BLOCKSTATE_NONE;
 			p->left=0;
 		}
 	}
 	/*スタート余白を設置*/
-	
+
 	for(y=0;y<STAGE_START_Y;++y){
 		for(x=0;x<GAME_STAGE_WIDTH;++x){
 			p=&(gamestage[x][y]);
-			
+
 			p->type=NO_BLOCK;
 			p->state=BLOCKSTATE_NONE;
 			p->left=0;
 		}
 	}
-	
+
 }
 
 void draw(void){
-	
-	
+
+
 	int x,y,i,gy;
-	
+
 	int delta_y;
-	
-	
-	
+
+
+
 	int vibration[]={
 		-1,-2,-3,-4,-3,-2,-1,0,
 		1,2,3,4,3,2,1,0,
@@ -1319,37 +1319,37 @@ void draw(void){
 		1,2,3,4,3,2,1,0,
 		-1,-2,-3,-4,-3,-2,-1,0,
 		1,2,3,4,3,2,1,0,
-	};	
-	
-	
-	
-	
-	
+	};
+
+
+
+
+
 	TBlockState *p;
-	
+
 	int alpha=0;
 	delta_y=my_y%48;
-	
+
 	for(gy=-delta_y,y=my_y/48-4;y<=my_y/48+7;++y,gy+=48){
 		if(y<0||y>=GAME_STAGE_HEIGHT)continue;
 		for(x=0;x<STAGE_WIDTH;x++){
 		alpha=0;
 			p=&(gamestage[x][y]);
 			if(p->type==NO_BLOCK)continue;
-			
+
 			if(p->type==HARD_BLOCK){
 				alpha=p->destroycount;
 //				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48+p->lefttime%6-3,gy-p->left);
 			}else if(p->type==AIR_BLOCK){
 //				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48+p->lefttime%6-3,gy-p->left);
-				
-				
+
+
 			}else{
 				switch(p->state){
 					case BLOCKSTATE_FALLING:
 					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48,gy-p->left);
 					break;
-					
+
 					case BLOCKSTATE_PREFALL:
 					if(p->lefttime<66)
 //					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48-p->lefttime%8+4,gy);
@@ -1357,16 +1357,16 @@ void draw(void){
 					else
 					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48,gy);
 					break;
-					
+
 					case BLOCKSTATE_EXTINGUISHING:
 						CBmpsBlit(cbmps_character,screen,109-p->extinguishingframe/4,x*48,gy);
 					break;
-					
+
 					case BLOCKSTATE_EXTINGUISHED:
 						CBmpsBlit(cbmps_character,screen,109,x*48,gy);
 					break;
-					
-					
+
+
 					default:
 				BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48,gy);
 				}
@@ -1381,18 +1381,18 @@ void draw(void){
 				case BLOCKSTATE_FALLING:
 				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48,gy-p->left);
 				break;
-				
+
 				case BLOCKSTATE_PREFALL:
 				if(p->lefttime<66)
 				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48+vibration[p->lefttime],gy);
 				else
 				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48,gy);
 				break;
-				
+
 				case BLOCKSTATE_EXTINGUISHING:
 					CBmpsBlit(cbmps_character,screen,109-p->extinguishingframe/4,x*48,gy);
 				break;
-				
+
 				case BLOCKSTATE_EXTINGUISHED:
 					CBmpsBlit(cbmps_character,screen,109,x*48,gy);
 				break;
@@ -1414,7 +1414,7 @@ void clear_blockflag(void){
 		p=&(gamestage[x][y]);
 		p->done=0;
 		p->unsetlock=0;
-		
+
 	}
 }
 
@@ -1425,7 +1425,7 @@ void clear_blockflag_sub(void){
 	for(x=0;x<GAME_STAGE_WIDTH;++x){
 		p=&(gamestage[x][y]);
 		p->done_sub=0;
-		
+
 	}
 }
 
@@ -1433,7 +1433,7 @@ void clear_blockflag_sub(void){
 //ブロックを消すときに同時に消すブロックをサーチ
 void search(int x,int y,int type){
 	TBlockState *p;
-	
+
 	p=&(gamestage[x][y]);
 	if(p->done)return;
 	if(p->type!=type)return;
@@ -1450,14 +1450,14 @@ void search(int x,int y,int type){
 }
 
 void self_destroy(int x,int y){
-	
+
 	TBlockState *p;
 	clear_blockflag();
 	p=&(gamestage[x][y]);
 	if(p->type==HARD_BLOCK){
-		
+
 		CWavsPlay(wavs,13);
-		
+
 		p->destroycount++;
 		if(p->destroycount>=5){
 			p->state=BLOCKSTATE_EXTINGUISHING;
@@ -1467,8 +1467,8 @@ void self_destroy(int x,int y){
 			airminus=1;airminuscount=0;
 //			erase_block();
 			p->player_dug=1;
-			
-			
+
+
 			scoreplus+=1;
 			scorerest+=1;
 //			my_score+=1;
@@ -1481,7 +1481,7 @@ void self_destroy(int x,int y){
 //	my_score++;
 }
 void destroy(int x,int y){
-	
+
 	TBlockState *p;
 	clear_blockflag();
 	p=&(gamestage[x][y]);
@@ -1489,9 +1489,9 @@ void destroy(int x,int y){
 	if(p->state==BLOCKSTATE_EXTINGUISHING) return;
 	search(x,y,p->type);
 //	erase_block();
-	
+
 	CWavsPlay(wavs,12);
-	
+
 }
 int erase_block(void){
 	TBlockState *p;
@@ -1499,23 +1499,23 @@ int erase_block(void){
 	int res=0;
 	for(y=0;y<GAME_STAGE_HEIGHT;++y)
 	for(x=0;x<GAME_STAGE_WIDTH;++x){
-	
+
 		p=&(gamestage[x][y]);
 		if(p->state == BLOCKSTATE_EXTINGUISHED){
 			res=1;
 			p->state=BLOCKSTATE_NONE;
 			p->type=NO_BLOCK;
-			
-			
+
+
 //			hanabiset(x,y);
-			
+
 		}
 	}
 	return res;
 }
 
 
-//check and return whether these blocks can fall 
+//check and return whether these blocks can fall
 //checksheat is 1 when calling search
 //4つ以上で消えるときのカウント
 void search_number(int x,int y,int type,int *number){
@@ -1534,7 +1534,7 @@ void search_number(int x,int y,int type,int *number){
 	if(y>0)search_number(x,y-1,type,number);
 	if(y<GAME_STAGE_HEIGHT-1)search_number(x,y+1,type,number);
 }
- 
+
 
 
 
@@ -1554,16 +1554,16 @@ void search_fall(int x,int y,int type,int *checksheat,int *checkleft){
 	if(q->type != NO_BLOCK && q->type != type){
 		if(q->state!=BLOCKSTATE_PREFALL && q->state!=BLOCKSTATE_FALLING)*checksheat&=0;
 	}else{
-		
+
 			;
 	}
-	
-	
-	
+
+
+
 	if(p->state==BLOCKSTATE_NONE)p->left=PREFALLTIME;
 	if(q->state==BLOCKSTATE_PREFALL)p->left=q->left;
 	if(p->left>*checkleft)*checkleft=p->left;
-	
+
 	if(x>0)search_fall(x-1,y,type,checksheat,checkleft);
 	if(x<GAME_STAGE_WIDTH-1)search_fall(x+1,y,type,checksheat,checkleft);
 	if(y>0)search_fall(x,y-1,type,checksheat,checkleft);
@@ -1581,10 +1581,10 @@ void setprefall(int x,int y,int type,int left){
 	if(p->done_sub)return;
 	if(p->type != type)return;
 	p->done_sub=1;
-	
+
 	if(p->state==BLOCKSTATE_FALLING)return;
-	
-/*	
+
+/*
 	p->state=BLOCKSTATE_FALLING;
 	p->left=48;
 */
@@ -1619,7 +1619,7 @@ void unsetprefall(int x,int y,int type){
 	p->lefttime=PREFALLTIME;
 	p->unsetlock=1;
 	if(p->type==AIR_BLOCK)return;
-	
+
 	if(x>0)unsetprefall(x-1,y,type);
 	if(x<GAME_STAGE_WIDTH-1)unsetprefall(x+1,y,type);
 	if(y>0)unsetprefall(x,y-1,type);
@@ -1641,7 +1641,7 @@ void unsetprefallfinished(int x,int y,int type){
 	p->lefttime=PREFALLTIME;
 	p->unsetlock=1;
 	if(p->type==AIR_BLOCK)return;
-	
+
 	if(x>0)unsetprefallfinished(x-1,y,type);
 	if(x<GAME_STAGE_WIDTH-1)unsetprefallfinished(x+1,y,type);
 	if(y>0)unsetprefallfinished(x,y-1,type);
@@ -1653,7 +1653,7 @@ void unsetprefallfinished(int x,int y,int type){
 
 //連鎖チェック
 void erase_check_recursive(int x,int y,int type,int *answer,int *number){
-	
+
 	TBlockState *p;
 
 	p=&gamestage[x][y];
@@ -1664,14 +1664,14 @@ void erase_check_recursive(int x,int y,int type,int *answer,int *number){
 	(*number)++;
 //	if(p->state==BLOCKSTATE_EXTINGUISHED||p->state==BLOCKSTATE_EXTINGUISHING)(*answer)=1;
 	if(p->state==BLOCKSTATE_FALLFINISHED)(*answer)=1;
-	
+
 	if(x>0)erase_check_recursive(x-1,y,type,answer,number);
 	if(x<GAME_STAGE_WIDTH-1)erase_check_recursive(x+1,y,type,answer,number);
 	if(y>0)erase_check_recursive(x,y-1,type,answer,number);
 	if(y<GAME_STAGE_HEIGHT-1)erase_check_recursive(x,y+1,type,answer,number);
-	
-	
-	
+
+
+
 }
 
 void seterase_recursive(int x,int y,int type){
@@ -1699,7 +1699,7 @@ void seterase_recursive(int x,int y,int type){
 
 }
 void erase_check(void){
-	
+
 	int x,y,answer,number;
 	TBlockState *p,*q;
 	clear_blockflag_sub();
@@ -1710,7 +1710,7 @@ void erase_check(void){
 		if(p->done)continue;
 		if(p->type == NO_BLOCK||p->type==AIR_BLOCK)continue;
 		if(p->state == BLOCKSTATE_FALLING /*|| p->state == BLOCKSTATE_PREFALL*/)continue;
-		
+
 		answer=0;number=0;
 		erase_check_recursive(x,y,p->type,&answer,&number);
 		if(answer == 1 && number>3){
@@ -1719,7 +1719,7 @@ void erase_check(void){
 		}
 
 	}
-	
+
 }
 
 void prefallcheck(void ){
@@ -1732,16 +1732,16 @@ void prefallcheck(void ){
 	for(x=0;x<GAME_STAGE_WIDTH;x++){
 		p=&gamestage[x][y];
 		if(p->type == NO_BLOCK)continue;
-		if(p->state == BLOCKSTATE_FALLING 
+		if(p->state == BLOCKSTATE_FALLING
 		||p->state==BLOCKSTATE_EXTINGUISHING
 		||p->state==BLOCKSTATE_EXTINGUISHED)continue;
-		
+
 		//if(p->state == BLOCKSTATE_FALLFINISHED)left=1;else left=PREFALLTIME;
 		q=&gamestage[x][y+1];
 		if(p->unsetlock)continue;
 		if(q->type==NO_BLOCK){
-			
-			
+
+
 			if(p->state==BLOCKSTATE_NONE){
 				p->lefttime=0;
 				if(q->player_dug)p->lefttime=PREFALLTIME;
@@ -1751,14 +1751,14 @@ void prefallcheck(void ){
 				p->state=BLOCKSTATE_PREFALL;
 			}else {
 				p->state=BLOCKSTATE_PREFALL;
-				
+
 			}
 		}/*else if(q->type==p->type){
-			
+
 			p->state=q->state;
 			p->state=q->state;
-			
-			
+
+
 		}*/
 		else if(q->state==BLOCKSTATE_PREFALL){
 			//if(p->state==BLOCKSTATE_NONE){
@@ -1770,11 +1770,11 @@ void prefallcheck(void ){
 		||q->state==BLOCKSTATE_FALLFINISHED||
 		q->state==BLOCKSTATE_EXTINGUISHED){
 			if(p->state!=BLOCKSTATE_FALLFINISHED){
-				
+
 				p->lefttime=PREFALLTIME;
 				p->state=BLOCKSTATE_NONE;
 				unsetprefall(x,y,p->type);
-				
+
 			}else{
 				unsetprefallfinished(x,y,p->type);
 //				p->state=BLOCKSTATE_PREFALL;
@@ -1785,12 +1785,12 @@ void prefallcheck(void ){
 				p->state=BLOCKSTATE_NONE;
 			unsetprefall(x,y,p->type);
 		}
-		
-		
-		
+
+
+
 	}
-	
-	
+
+
 	clear_blockflag();
 	clear_blockflag_sub();
 	for(y=GAME_STAGE_HEIGHT-5;y>=1;y--)
@@ -1804,9 +1804,9 @@ void prefallcheck(void ){
 		leftcheck(x,y,p->type,&lefttime,&check);
 		setleft(x,y,p->type,lefttime);
 	}
-	
-	
-	
+
+
+
 }
 
 //ぐらぐらをあわせる処理
@@ -1817,28 +1817,28 @@ void leftcheck(int x,int y,int type,int *checkleft,int *check){
 	int lefttime;
 	p=&gamestage[x][y];
 	q=&gamestage[x][y+1];
-	
-	
+
+
 	if(p->done)return;
 	if(p->type != type)return;
 	p->done=1;
 //	if(p->state!=BLOCKSTATE_PREFALL)return;
 	if(p->state==BLOCKSTATE_FALLING||p->state==BLOCKSTATE_EXTINGUISHING)return;
-	
+
 	if(p->lefttime>(*checkleft)){
 		*checkleft=p->lefttime;
 //		*check=0;
 	}
 	if(q->type!=p->type){
-		
+
 		if(q->type != NO_BLOCK //&&
 //			q->state!=BLOCKSTATE_EXTINGUISHING &&
 //			q->state!=BLOCKSTATE_EXTINGUISHED
 			){
-			
+
 			if(q->state==BLOCKSTATE_PREFALL && p->state==BLOCKSTATE_PREFALL){
 				if(q->lefttime>(*checkleft)) *checkleft=q->lefttime;
-				
+
 			}else{
 				/* if(q->state==BLOCKSTATE_NONE||q->state==BLOCKSTATE_FALLFINISHED
 				||q->state==BLOCKSTATE_FALLING){
@@ -1847,15 +1847,15 @@ void leftcheck(int x,int y,int type,int *checkleft,int *check){
 				if(q->player_dug)lefttime=PREFALLTIME;
 				if(lefttime>(*checkleft)) *checkleft=lefttime;
 				*check=0;
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	if(p->type==AIR_BLOCK)return;
-	
+
 	if(x>0)leftcheck(x-1,y,type,checkleft,check);
 	if(x<GAME_STAGE_WIDTH-1)leftcheck(x+1,y,type,checkleft,check);
 	if(y>0)leftcheck(x,y-1,type,checkleft,check);
@@ -1869,11 +1869,11 @@ void setleft(int x,int y,int type,int left){
 
 	p=&gamestage[x][y];
 	q=&gamestage[x][y-1];
-	
+
 	if(p->done_sub)return;
 	if(p->type != type)return;
 	p->done_sub=1;
-	
+
 //	if(p->state==BLOCKSTATE_FALLING||p->state==BLOCKSTATE_EXTINGUISHING)return;
 	if(p->state!=BLOCKSTATE_PREFALL)return;
 
@@ -1882,7 +1882,7 @@ void setleft(int x,int y,int type,int left){
 		q->state!=BLOCKSTATE_EXTINGUISHING &&
 		q->type!=NO_BLOCK &&
 		q->state==BLOCKSTATE_PREFALL)q->lefttime=left;
-*/	
+*/
 	if(p->type==AIR_BLOCK)return;
 
 	if(x>0)setleft(x-1,y,type,left);
@@ -1906,10 +1906,10 @@ void blockprocess(void){
 		if(p->type==NO_BLOCK)continue;
 
 		switch(p->state){
-			
-			
+
+
 			case BLOCKSTATE_PREFALL:{
-	
+
 				p->lefttime--;
 				if(p->lefttime<=0){
 					p->lefttime=0;
@@ -1917,37 +1917,37 @@ void blockprocess(void){
 //					if(q->state==BLOCKSTATE_EXTINGUISHING)hanabiset(x,y+1,q->extinguishingframe);
 
 					*q=*p;
-					
+
 					p->type=NO_BLOCK;
 					p->state=BLOCKSTATE_NONE;
-					
+
 					q->state=BLOCKSTATE_FALLING;
 					q->left=48-WALKSPEED_Y;
-	
+
 				}
 			}break;
-	
-	
+
+
 			case BLOCKSTATE_FALLING:{
-	
+
 				p->left-=WALKSPEED_Y;
 				if(p->left<WALKSPEED_Y){//finshing.
-		
+
 					p->left=0;
 					p->lefttime=1;
 					p->state=BLOCKSTATE_FALLFINISHED;
 				}
-		
-	
+
+
 			}break;
-	
+
 			case BLOCKSTATE_EXTINGUISHING:{
-				
+
 				p->extinguishingframe--;
 				if(p->extinguishingframe==0)p->state=BLOCKSTATE_EXTINGUISHED;
-				
+
 			}break;
-			
+
 			case BLOCKSTATE_FALLFINISHED:{
 			}break;
 		}
@@ -1957,7 +1957,7 @@ void blockprocess(void){
 
 #define HANABIMAX 100
 typedef struct{
-	
+
 	int x;
 	int y;
 	int time;
@@ -1969,23 +1969,23 @@ void clearhanabi(void){
 	int i;
 	Thanabi init={0,0,0,0};
 	for(i=0;i<HANABIMAX;++i){
-		
+
 		hanabi[i]=init;
-		
+
 	}
 }
 void drawhanabi(void){
 	Thanabi* p;
 	int gy;
 	int i;
-	
+
 	for(i=0;i<HANABIMAX;++i){
 		p=&hanabi[i];
 		if(!p->avail)continue;
-		
+
 		p->time--;
 		if(p->time<=0){
-			
+
 			p->avail=0;
 			continue;
 		}
@@ -1993,7 +1993,7 @@ void drawhanabi(void){
 		if(gy>-48 && gy<640){
 			//draw
 			CBmpsBlit(cbmps_character,screen,109-p->time/3,p->x*48,gy);
-			
+
 		}else{
 			p->avail=0;
 		}
@@ -2001,21 +2001,21 @@ void drawhanabi(void){
 }
 
 int hanabiset(int x,int y,int n){
-	
+
 	int i=0;
-	
+
 	do{
 		if(hanabi[i].avail!=0)i++;else{
-			
+
 			hanabi[i].x=x;
 			hanabi[i].y=y;
 			hanabi[i].time=n;
 			hanabi[i].avail=1;
-			
+
 			return 0;
 		}
 	}while(i<HANABIMAX);
-	
+
 	return 1;
 }
 
@@ -2023,34 +2023,34 @@ int hanabiset(int x,int y,int n){
 
 
 void moveTilescroll(void){
-	
+
 	CTileScroll *p;
 	int interval=66;//milisec
 	p=&tscroll;
-	
+
 	if(p->clock+interval<gametime.clock){
 		p->x--;
 		if(p->x<=-(p->bmp->w))p->x=0;
 		p->y--;
 		if(p->y<=-(p->bmp->h))p->y=0;
-		
+
 		p->clock=gametime.clock;
 	}else{
 		if(p->clock>gametime.clock+interval*5)p->clock=gametime.clock;
 	}
-	
+
 }
 void drawTilescroll(void){
-	
+
 	int x,y;
-	
+
 	for(y=tscroll.y;y<screen->h;y+=tscroll.bmp->h){
 		for(x=tscroll.x;x<screen->w;x+=tscroll.bmp->w){
-		
+
 			CBmpsBlit(cbmps_character,screen,52,x,y);
 		}
 	}
-	
+
 }
 
 int title(void){
@@ -2063,20 +2063,20 @@ int title(void){
 	};
 	int nx=0,maxx;
 	int wait=0;
-	
+
 	maxx=sizeof(dx)/sizeof(int);
-	
+
 	CTimeReset(&gametime);
 	CTimeChangeFPS(&gametime,FPS_MAX);
 	do{
 //		joy_space=joy_cancel=joy_up=joy_down=0;
 		if(keyread())return 0;;
 		moveTilescroll();
-		
+
 		CInputUpdate(gameinput,0);
-		
+
 	//	keys = SDL_GetKeyState(NULL);
-	/*	
+	/*
 		if(joystick && SDL_JoystickGetButton(joystick, setting_joyconfirm) == SDL_PRESSED)joy_space=1;
 		if(joystick && SDL_JoystickGetButton(joystick, setting_joycancel) == SDL_PRESSED)joy_cancel=1;
 		if(joystick && (int)SDL_JoystickGetAxis(joystick, 1) > setting_joyaxismax)joy_down=1;
@@ -2090,18 +2090,18 @@ int title(void){
 				case 0:{
 					SDL_Delay(500);return 2;
 				}break;
-				
+
 				case 1:{
 					SDL_Delay(500);
 					if(!highscore())return 0;
 					SDL_Delay(500);
 					y=0;
 				}break;
-				
+
 				case 2:{
 					return 0;
 				}break;
-				
+
 			}
 		}
 /*
@@ -2125,9 +2125,9 @@ int title(void){
 			wait=15;
 		}
 		wait--;if(wait<=0)wait=0;
-		
+
 		if(!gametime.isDelay){
-			
+
 			drawTilescroll();
 			CBmpsBlit(cbmps_character,screen,50,0,0);
 			for(i=0;i<3;++i){
@@ -2160,67 +2160,67 @@ char highscoretemp_name[4];
 
 
 int init_nameentry(int score,int depth,int playtime){
-	
-	
+
+
 	int i;
-	
+
 	nameentry_x=0;
 	nameentry_x_wait=0;
 	space_repeat=0;
 	bs_repeat=0;
 	nameentry_vx=0;
 	name_x=0;
-	
-	
+
+
 	highscoretemp_score=score;
 	highscoretemp_depth=depth;
 	highscoretemp_playtime=playtime;
-	
+
 	THighScoreAdd(&highscoredata,"___",playtime,depth,score);
 	THighScoreSortByTime(&highscoredata);
 	THighScoreSortByDepth(&highscoredata);
 	THighScoreSortByScore(&highscoredata);
-	
+
 	for(i=0;i<SCOREMEMBER+1;++i){
 		if(!strcmp(highscoredata.name[i],"___"))break;
 	}
 	highscoretemp_entrynumber_score=i;
-	
-	
-	
+
+
+
 	THighScoreAdd(&fasttimedata,"___",playtime,depth,score);
 	THighScoreSortByDepth(&fasttimedata);
 	THighScoreSortByScore(&fasttimedata);
 	THighScoreSortByTime(&fasttimedata);
-	
+
 	for(i=0;i<SCOREMEMBER+1;++i){
 		if(!strcmp(fasttimedata.name[i],"___"))break;
 	}
 	highscoretemp_entrynumber_time=i;
-	
-	
-	
+
+
+
 	if(highscoretemp_entrynumber_score==SCOREMEMBER&&
 	highscoretemp_entrynumber_time==SCOREMEMBER)return -1;//highsore is not marked!
-	
+
 	strcpy(highscoretemp_name,"___");
 	CWavsPlayMusicStyle(wavs,2);
-	
-	
+
+
 	return i;
-	
+
 }
 
 int move_nameentry(void){
-	
+
 	Uint8 *keys;
 //	int joy_up=0,joy_down=0,joy_left=0,joy_right=0,joy_space=0,joy_cancel=0;
 
-	
+
 	if(nameentry_x_wait==0)keys = SDL_GetKeyState(NULL);
 	if(nameentry_x_wait==0){
-		
-		
+
+
 		CInputUpdate(gameinput,0);
 		/*
 		if(joystick && SDL_JoystickGetButton(joystick, setting_joyconfirm) == SDL_PRESSED)joy_space=1;
@@ -2228,52 +2228,52 @@ int move_nameentry(void){
 		if(joystick && (int)SDL_JoystickGetAxis(joystick, 0) > setting_joyaxismax)joy_right=1;
 		if(joystick && (int)SDL_JoystickGetAxis(joystick, 0) < -setting_joyaxismax)joy_left=1;
 		*/
-		
-		
+
+
 		if ( (gameinput->button[BUTTON_RIGHT]) && nameentry_x<sizeof(nameentry_moji)-2 ) {nameentry_x_wait=8;nameentry_vx=1;}
 		if ( (gameinput->button[BUTTON_LEFT]) && nameentry_x>0 ) {nameentry_x_wait=8;nameentry_vx=-1;}
-	
+
 		if ( gameinput->button[BUTTON_2] ){
 			if(!strcmp(highscoretemp_name,"___"))strcpy(highscoretemp_name,"S.H");
 			strcpy(highscoredata.name[highscoretemp_entrynumber_score],highscoretemp_name);
 			strcpy(fasttimedata.name[highscoretemp_entrynumber_time],highscoretemp_name);
-			
+
 			return 1;
 		}
 		if (gameinput->button[BUTTON_0]){
-			
+
 			if(space_repeat);else{
-			
-			
+
+
 				if(name_x<3){
-					
+
 					highscoretemp_name[name_x]=nameentry_moji[nameentry_x];
 					name_x++;
 				};
-			
-			
+
+
 				space_repeat=1;
 			}
-		
+
 		}else{
 			space_repeat=0;
 		}
 		if ( gameinput->button[BUTTON_1] ){
-			
+
 			if(bs_repeat);else{
-			
+
 				if(name_x>0)name_x--;
 				highscoretemp_name[name_x]=' ';
-			
-			
+
+
 				bs_repeat=1;
 			}
-		
+
 		}else{
 			bs_repeat=0;
 		}
 	}
-	
+
 	if(nameentry_x_wait>0){
 		nameentry_x_wait--;
 		if(nameentry_x_wait==0){
@@ -2285,22 +2285,22 @@ int move_nameentry(void){
 }
 
 int draw_nameentry(void){
-	
+
 	char buf[4096];
-	
-	
+
+
 	CffontBlitxy(font,nameentry_moji,screen,5+308-nameentry_x*16,300+5);
 	CBmpsBlit(cbmps_character,screen,53,0,0);
-	
+
 }
 
 int nameentry(void){
-	
+
 	char buffer[4096];
 	Uint8 *keys;
 	char *scoreboard="NAME DEPTH   SCORE  TIME";
-	
-	
+
+
 	CTimeReset(&gametime);
 	CTimeChangeFPS(&gametime,FPS_MAX);
 	do{
@@ -2310,13 +2310,13 @@ int nameentry(void){
 			return 0;
 			}
 		moveTilescroll();
-		
+
 		keys = SDL_GetKeyState(NULL);
 		if(move_nameentry())break;
 		if(!gametime.isDelay){
-			
+
 			drawTilescroll();
-			
+
 			if(highscoretemp_depth!=1000){
 				sprintf(buffer," %3s %4d  %6d0  --'--'--",
 					highscoretemp_name,
@@ -2331,14 +2331,14 @@ int nameentry(void){
 					highscoretemp_playtime/6000,
 					(highscoretemp_playtime/100)%60,
 					highscoretemp_playtime%100
-					
+
 				);
 			}
 			CffontBlitxy(font,buffer,screen,70,25+150);
 			CffontBlitxy(font,scoreboard,screen,70,150);
-			
+
 			draw_nameentry();
-			
+
 			SDL_Flip(screen);
 			//SDL_UpdateRect(screen,0,0,0,0);
 		}
@@ -2354,8 +2354,8 @@ int highscore(void){
 	char *scoreboard="NAME DEPTH   SCORE";
 	char *scoreboard_fast="NAME   SCORE   TIME";
 	int mode=0;//0--highscore 1--fasttime
-	
-	
+
+
 //	int joy_space=0;
 	for(i=0;i<SCOREMEMBER;++i){
 		sprintf(buf[i]," %3s %4d  %6d0",
@@ -2363,7 +2363,7 @@ int highscore(void){
 			highscoredata.depth[i],
 			highscoredata.score[i]
 		);
-			
+
 	}
 	for(i=0;i<SCOREMEMBER;++i){
 		sprintf(buf_fast[i]," %3s %6d0 %02d'%02d'%02d",
@@ -2372,10 +2372,10 @@ int highscore(void){
 			fasttimedata.time[i]/6000,
 			(fasttimedata.time[i]/100)%60,
 			fasttimedata.time[i]%100
-			
+
 			);
-		
-		
+
+
 	}
 	CTimeReset(&gametime);
 	CTimeChangeFPS(&gametime,setting_defaultFPS);
@@ -2383,7 +2383,7 @@ int highscore(void){
 //		joy_space=0;
 		if(keyread())return 0;
 		moveTilescroll();
-		
+
 //		keys = SDL_GetKeyState(NULL);
 		CInputUpdate(gameinput,0);
 //		if(joystick && SDL_JoystickGetButton(joystick, setting_joyconfirm) == SDL_PRESSED)joy_space=1;
@@ -2395,11 +2395,11 @@ int highscore(void){
 			mode--;
 		}
 
-		
+
 		if(!gametime.isDelay){
-			
+
 			drawTilescroll();
-			
+
 			if(mode==0){
 				CBmpsBlit(cbmps_character,screen,51,0,0);
 				CffontBlitxy(font,scoreboard,screen,130,120);
@@ -2407,23 +2407,23 @@ int highscore(void){
 				CBmpsBlit(cbmps_character,screen,54,0,0);
 				CffontBlitxy(font,scoreboard_fast,screen,130,120);
 			}
-			
+
 			for(i=0;i<SCOREMEMBER;++i){
-			
+
 				if(mode==0){
 					CffontBlitxy(font,buf[i],screen,130,i*25+150);
 				}else{
 					CffontBlitxy(font,buf_fast[i],screen,130,i*25+150);
-					
+
 				}
 			}
-			
+
 			SDL_Flip(screen);
 			//SDL_UpdateRect(screen,0,0,0,0);
 		}
 		CTimeWait(&gametime);
 	}while(1);
-	
+
 	return 0;
 }
 
@@ -2437,12 +2437,12 @@ void THighScoreSwap(THighScore *p,int i,int j){
 	time=p->time[j];
 	score=p->score[j];
 	depth=p->depth[j];
-	
+
 	strcpy(p->name[j],p->name[i]);
 	p->time[j]=p->time[i];
 	p->score[j]=p->score[i];
 	p->depth[j]=p->depth[i];
-	
+
 	strcpy(p->name[i],name);
 	p->time[i]=time;
 	p->score[i]=score;
@@ -2451,77 +2451,77 @@ void THighScoreSwap(THighScore *p,int i,int j){
 
 int THighScoreSortByTime(THighScore *p){
 	int i,j;
-	
+
 	for(j=0;j<SCOREMEMBER;++j)
 	for(i=j+1;i<SCOREMEMBER+1;++i){
 		if(p->time[i]<p->time[j])THighScoreSwap(p,i,j);
 	}
-	
+
 }
 int THighScoreSortByDepth(THighScore *p){
 	int i,j;
-	
+
 	for(j=0;j<SCOREMEMBER;++j)
 	for(i=j+1;i<SCOREMEMBER+1;++i){
 		if(p->depth[i]>p->depth[j])THighScoreSwap(p,i,j);
 	}
-	
+
 }
 int THighScoreSortByScore(THighScore *p){
 	int i,j;
-	
+
 	for(j=0;j<SCOREMEMBER;++j)
 	for(i=j+1;i<SCOREMEMBER+1;++i){
 		if(p->score[i]>p->score[j])THighScoreSwap(p,i,j);
 	}
-	
+
 }
 
 int THighScoreAdd(THighScore *p,char *name,int time,int depth,int score){
-	
+
 	strcpy(p->name[SCOREMEMBER],name);
 	p->time[SCOREMEMBER]=time;
 	p->depth[SCOREMEMBER]=depth;
 	p->score[SCOREMEMBER]=score;
-	
+
 }
 
 int THighScoreSave(THighScore *p,char *filename){
-	
+
 	FILE *fp;
 	int i;
-	
+
 	fp=fopen(filename,"wb");
 	if(fp==NULL){
 		fprintf(stderr,"cant open %s",filename);
 		return -1;
 	}
 	for(i=0;i<SCOREMEMBER;++i){
-		
+
 		fprintf(fp,highscoreformat,
 			(p->name[i]),
 			(p->time[i]),
 			(p->depth[i]),
 			(p->score[i])
 			);
-		
+
 	}
 	fclose(fp);
 	return 0;
 }
 int THighScoreLoad(THighScore *p,char *filename){
-	
-	
+
+
 	int i;
 	FILE *fp;
 	THighScore init={
-		
+
 		{"ZEN","K.K","IKU","FKD","IWA","M.N","TT ","KOB","SAD","ADA","DUM"},
 		{100000,100000,100000,100000,100000,100000,100000,100000,100000,100000,100000},
 		{100,90,80,70,60,50,40,30,20,10,0},
 		{100,90,80,70,60,50,40,30,20,10,0}
 	};
-	
+
 	fp=fopen(filename,"rb");
 	if(fp==NULL){
 		printf("create new save file\n");
@@ -2529,14 +2529,14 @@ int THighScoreLoad(THighScore *p,char *filename){
 		return THighScoreSave(&init,filename);
 	}
 	for(i=0;i<SCOREMEMBER;++i){
-		
+
 		fscanf(fp,highscoreformat,
 			&(p->name[i]),
 			&(p->time[i]),
 			&(p->depth[i]),
 			&(p->score[i])
 			);
-		
+
 	}
 	fclose(fp);
 }
@@ -2552,7 +2552,7 @@ void joy_init(void){
 		printf("Couldn't open joystick \n");
 	}
 	*/
-	
+
 	gameinput=CInputInit(setting_joysticknumber,setting_joyenabled);
 	CInputDefaultSetting(gameinput);
 	CInputHoldButtons(gameinput);
@@ -2562,16 +2562,16 @@ void joy_init(void){
 }
 void joy_final(void){
 	//SDL_JoystickClose(joystick);
-	
+
 	CInputFree(gameinput);
 	gameinput=NULL;
-	
+
 }
 
 
 
 int BlitForBlock(SDL_Surface *p,SDL_Surface *dest,int num,int x,int y){
-	
+
 	SDL_Rect dr;
 	int i;
 	SDL_Rect rects[]={
@@ -2584,51 +2584,51 @@ int BlitForBlock(SDL_Surface *p,SDL_Surface *dest,int num,int x,int y){
 		{ 96,  0,48,48},
 		{144,144,48,48},
 		{ 96,144,48,48},
-		
+
 		{  0, 48,48,48},
 		{ 48, 48,48,48},
 		{  0, 96,48,48},
 		{ 48, 96,48,48},
-		
+
 		{144, 48,48,48},
 		{ 96, 48,48,48},
 		{144, 96,48,48},
 		{ 96, 96,48,48},
-		
-		
+
+
 	};
-	
+
 	if(p==NULL)return(-1);
-	
+
 	dr.w=rects[num].w;
 	dr.h=rects[num].h;
 	dr.x=x;
 	dr.y=y;
-	
+
 	SDL_BlitSurface(p,&rects[num],dest,&dr);
-	
+
 	return 0;
-	
+
 }
 
 //形を整える
 void set_shape(void){
-	
+
 	int x,y;
 	TBlockState *p;
-	
-	
+
+
 	for(y=0;y<GAME_STAGE_HEIGHT;++y){
 		for(x=0;x<GAME_STAGE_WIDTH;++x){
 			p=&(gamestage[x][y]);
 			if(p->type==NO_BLOCK||p->type==HARD_BLOCK||p->type==AIR_BLOCK)continue;
-			
+
 			if(p->state==BLOCKSTATE_FALLING
 				||p->state==BLOCKSTATE_PREFALL
 				||p->state==BLOCKSTATE_EXTINGUISHING
 			)continue;
 			p->shape=0;
-			
+
 			if(x>0  &&gamestage[x-1][y].type==p->type)p->shape+=4;
 			if(x<GAME_STAGE_WIDTH-1  && gamestage[x+1][y].type==p->type)p->shape+=1;
 			if(y>0  && gamestage[x][y-1].type==p->type)p->shape+=2;
