@@ -50,10 +50,10 @@ dist: $(BINARY)
 	mkdir -p $(OUTDIR)/dist/system/bmp
 	mkdir -p $(OUTDIR)/dist/system/wav
 	cp dat/* $(OUTDIR)/dist
-	cp gfx/*.txt $(OUTDIR)/dist
+	cp gfx/blockbg.txt gfx/charabg.txt gfx/otherbg.txt $(OUTDIR)/dist
+	cp gfx/player.txt $(OUTDIR)/dist/susumi
 	cp gfx/*.bmp $(OUTDIR)/dist
 	cp gfx/susumi-$(RES)/*.bmp $(OUTDIR)/dist/susumi
-	cp gfx/susumi-$(RES)/*.txt $(OUTDIR)/dist/susumi
 	cp gfx/system-$(RES)/*.bmp $(OUTDIR)/dist/system/bmp
 	cp snd/*.txt $(OUTDIR)/dist
 	cp snd/wav/*wav $(OUTDIR)/dist/system/wav
