@@ -63,7 +63,7 @@ int CWavsLoadWzNum(CWavs* this,char *filename,int num){
 	if(this==NULL)return(-1);
 	this->index=num;
 	if(this->index==this->nums){
-		fprintf(stderr,"ERROR:excess CBmps.nums : %d\n",num);
+		fprintf(stderr,"ERROR:excess CWavs.nums : %d\n",num);
 		return(-1);
 	}
 
@@ -117,10 +117,9 @@ int CWavsLoadFromFileWithDir(CWavs *this,char *filename,char *dir){
 	char *ignore="#\r\n";
 	int index;
 	char * p;
-	Uint32 trans;//for black as transparent color
 
 	if(this==NULL){
-		fprintf(stderr,"ERROR:must allocate CBmps before CBmpsLoadFromFile()\n");
+		fprintf(stderr,"ERROR:must allocate CWavs before CWavsLoadFromFileWithDir()\n");
 		return(-1);
 	}
 
