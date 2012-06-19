@@ -146,14 +146,14 @@ int CWavsLoadFromFileWithDir(CWavs *this,char *filename,char *dir){
 }
 
 
-int CWavsPlay(CWavs *this,int index){
+void CWavsPlay(CWavs *this,int index){
 
 	Mix_PlayChannel(-1, this->wav[index], 0);
 
 
 }
 
-int CWavsPlayMusicStyle(CWavs *this,int index){
+void CWavsPlayMusicStyle(CWavs *this,int index){
 
 	if(this->musicchannel!=-1)
 //		Mix_FadeOutChannel(this->musicchannel, 1000);

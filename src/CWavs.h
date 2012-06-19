@@ -25,7 +25,7 @@ int CAudioClose(void);
 int CWavsLoadFromFileWithDir(CWavs *,char *,char *);
 #define CWavsLoadFromFile(A,B)	CWavsLoadFromFileWithDir(A,B,"./")
 
-int CWavsPlay(CWavs *,int);
-int CWavsPlayMusicStyle(CWavs *,int);
+void CWavsPlay(CWavs *,int);
+void CWavsPlayMusicStyle(CWavs *,int);
 
 #endif
