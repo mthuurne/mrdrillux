@@ -10,7 +10,6 @@
 //‰æ‘œ—p\‘¢‘Ì‰Šú‰»
 //ˆø”FÅ‘å‰æ‘œ”
 CBmps* CBmpsInit(int nums){
-	int i;
 	CBmps *p;
 
 	if( nums < 0 )return(NULL);
@@ -91,8 +90,6 @@ int CBmpsConvert(CBmps* this){
 
 	int i,res=0;
 	SDL_Surface *sf,*converted;
-
-	Uint32 trans;
 
 	for(i=0;i<this->nums;++i){
 		sf=this->bmp[i];
