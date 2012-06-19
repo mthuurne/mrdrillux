@@ -338,40 +338,29 @@ int BlitForBlock(SDL_Surface *p,SDL_Surface *dest,int num,int x,int y);
 void set_shape(void);
 
 
-main(int argc,char **argv){
-
-	int done=0;
-
+int main(int argc, char **argv) {
 	load_setting();
 
 	initialize();
 	load_graphic();
 
-
 	THighScoreLoad(&highscoredata,scorefile);
 	THighScoreLoad(&fasttimedata,fasttimefile);
 
+	while (1) {
+		CWavsPlayMusicStyle(wavs, 0);
+		if (!title()) break;
 
-	/*
-	draw();
-	draw_me();
-	SDL_UpdateRect(screen,0,0,0,0);
-	*/
-	do{
-		CWavsPlayMusicStyle(wavs,0);
-		if(!title())break;
-
-		CWavsPlayMusicStyle(wavs,1);
-
-
+		CWavsPlayMusicStyle(wavs, 1);
 		game_ready();
-		if(!mainloop())done = 1;
-	}while(!done);
+		if (!mainloop()) break;
+	}
 
-
-	THighScoreSave(&highscoredata,scorefile);
-	THighScoreSave(&fasttimedata,fasttimefile);
+	THighScoreSave(&highscoredata, scorefile);
+	THighScoreSave(&fasttimedata, fasttimefile);
 	finalize();
+
+	return 0;
 }
 
 
