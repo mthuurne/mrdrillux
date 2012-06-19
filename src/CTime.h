@@ -37,8 +37,8 @@ typedef struct{
 
 }CTime;
 
-int CTimeReset(CTime *);
-int CTimeWait(CTime *);
-int CTimeChangeFPS(CTime *,int);
+void CTimeReset(CTime *);
+void CTimeWait(CTime *);
+void CTimeChangeFPS(CTime *, int);
 
 #endif

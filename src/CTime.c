@@ -1,14 +1,12 @@
 #include "CTime.h"
 
-int CTimeWait(CTime *p){
-
+void CTimeWait(CTime *p) {
 	Uint32 lefttime;
 
 	p->nowtime=SDL_GetTicks();
 	p->under+=p->interval;
 	lefttime=p->lasttime+(p->under>>16)-p->nowtime;
 	if(p->lasttime+(p->under>>16)>p->nowtime){
-//		while(p->lasttime+(p->under>>16)>SDL_GetTicks());
 		SDL_Delay(lefttime);
 		p->isDelay=0;
 		p->framecount++;
@@ -24,15 +22,9 @@ int CTimeWait(CTime *p){
 		p->fpsclock-=1000;
 	}
 	p->under &= 0x0ffff;
-
-	return(0);
-
-
-
 }
-int CTimeReset(CTime *p){
 
-//	p->interval=( 65536.0*1000.0/FPS_MAX );
+void CTimeReset(CTime *p) {
 	p->nowtime=SDL_GetTicks();
 	p->lasttime=p->nowtime;
 	p->under=0;
@@ -42,10 +34,8 @@ int CTimeReset(CTime *p){
 	p->fps=0;
 	p->fpsclock=0;
 	p->framecount=0;
-
-
-	return(0);
 }
-int CTimeChangeFPS(CTime *p,int fpsmax){
+
+void CTimeChangeFPS(CTime *p, int fpsmax) {
 	p->interval=( 65536.0*1000.0/fpsmax );
 }
