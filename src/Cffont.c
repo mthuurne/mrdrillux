@@ -130,7 +130,7 @@ int CffontBlitxy(Cffont *this,char *string,SDL_Surface *surf,int x,int y){
 		dest.y=y;
 		dest.w=this->width;
 		dest.h=this->height;
-		src=this->fontarea[*string];
+		src=this->fontarea[(unsigned int)*string];
 		SDL_BlitSurface(this->font,&src,surf,&dest);
 		string++;
 		x+=this->width;
