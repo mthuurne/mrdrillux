@@ -3,6 +3,7 @@
 **************************/
 
 #include "CBmps.h"
+#include "geometry.h"
 
 
 
@@ -132,7 +133,7 @@ int CBmpsSetTransparent(CBmps* this,int r,int g,int b){
 SDL_Surface* CScreenInitDefault(void){
 
 	int flags=SDL_SWSURFACE;
-	return CScreenInit(640,480,16,flags);
+	return CScreenInit(SCREEN_WIDTH,SCREEN_HEIGHT,16,flags);
 }
 SDL_Surface* CScreenInitDefaultHW(void){
 
@@ -142,7 +143,7 @@ SDL_Surface* CScreenInitDefaultHW(void){
 //	int flags=SDL_HWSURFACE|SDL_FULLSCREEN;
 //	int flags=SDL_SWSURFACE;
 //	int flags=SDL_SWSURFACE|SDL_FULLSCREEN|SDL_HWPALETTE;
-	return CScreenInit(640,480,16,flags);
+	return CScreenInit(SCREEN_WIDTH,SCREEN_HEIGHT,16,flags);
 }
 
 SDL_Surface* CScreenInit(int w,int h,int bpp,int flags){

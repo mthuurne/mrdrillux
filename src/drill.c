@@ -10,6 +10,7 @@ coding is restarted from 2000/8/28
 */
 
 #include "drill.h"
+#include "geometry.h"
 #include "Cffont.h"
 #include "CTime.h"
 #include "CInput.h"
@@ -49,7 +50,11 @@ CBmps* cbmps_blocks;
 char *blockfile="blockbg.txt";
 
 Cffont *font=NULL;
-char *fontfile="engrave16.bmp";
+#define FONT_FILE_FOR_SIZE_INNER(SIZE) "engrave" #SIZE ".bmp"
+#define FONT_FILE_FOR_SIZE(SIZE) FONT_FILE_FOR_SIZE_INNER(SIZE)
+char *fontfile=FONT_FILE_FOR_SIZE(FONT_SIZE);
+#undef FONT_FILE_FOR_SIZE_INNER
+#undef FONT_FILE_FOR_SIZE
 
 #define	CHARACTER_NUM 256
 CBmps* cbmps_character;
@@ -460,18 +465,18 @@ void gameover(void){
 
 
 	my_time=1000000;//for no clear time
-	printf("%d %d %d\n",my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time);
+	printf("%d %d %d\n",my_score,my_depth*100+my_y/TILE_SIZE-STAGE_START_Y+1,my_time);
 
-	if(init_nameentry(my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time) < 0);else
+	if(init_nameentry(my_score,my_depth*100+my_y/TILE_SIZE-STAGE_START_Y+1,my_time) < 0);else
 		nameentry();
 
 
 }
 void gameclear(void){
 
-	printf("%d %d %d\n",my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time);
+	printf("%d %d %d\n",my_score,my_depth*100+my_y/TILE_SIZE-STAGE_START_Y+1,my_time);
 
-	if(init_nameentry(my_score,my_depth*100+my_y/48-STAGE_START_Y+1,my_time) < 0);else
+	if(init_nameentry(my_score,my_depth*100+my_y/TILE_SIZE-STAGE_START_Y+1,my_time) < 0);else
 		nameentry();
 
 
@@ -483,14 +488,14 @@ int atarihantei(void){
 	int mapx,mapy;
 	TBlockState *p;
 	int deltax,deltay;
-	deltax=my_x%48;
-	deltay=my_y%48;
-	mapx=my_x/48;
-	mapy=my_y/48;
-	if(my_x%48>=24)mapx++;
-	if(my_y%48>=24)mapy++;
+	deltax=my_x%TILE_SIZE;
+	deltay=my_y%TILE_SIZE;
+	mapx=my_x/TILE_SIZE;
+	mapy=my_y/TILE_SIZE;
+	if(my_x%TILE_SIZE>=TILE_SIZE/2)mapx++;
+	if(my_y%TILE_SIZE>=TILE_SIZE/2)mapy++;
 	p=&gamestage[mapx][mapy];
-	if(p->type==AIR_BLOCK && p->left <24){
+	if(p->type==AIR_BLOCK && p->left < TILE_SIZE/2){
 		p->type=NO_BLOCK;
 		p->state=BLOCKSTATE_NONE;
 		p->player_dug=1;
@@ -503,62 +508,54 @@ int atarihantei(void){
 
 	}else
 	if(p->type!=NO_BLOCK && p->state!=BLOCKSTATE_EXTINGUISHING && p->state!=BLOCKSTATE_EXTINGUISHED){
-		if(p->left<24){
+		if(p->left < TILE_SIZE/2){
 		my_dead=1;my_deadcount=0;vx=0;
 		return 1;
 		}
 	}else
-	if(mapx>0 && my_x%48==24 && gamestage[mapx-1][mapy].type!=NO_BLOCK &&
+	if(mapx>0 && my_x%TILE_SIZE==TILE_SIZE/2 &&
+		gamestage[mapx-1][mapy].type!=NO_BLOCK &&
 		gamestage[mapx-1][mapy].type!=AIR_BLOCK &&
 		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHING &&
-		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHED){
-		if(p->left<24){
-		my_dead=1;my_deadcount=0;vx=0;
-		return 1;
+		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHED
+		){
+		if(p->left < TILE_SIZE/2){
+			my_dead=1;my_deadcount=0;vx=0;
+			return 1;
 		}
 	}
 	if(my_air==0){my_dead=1;my_deadcount=0;vx=0;return 2;}
 	//•â³
-	if(deltay==0 && deltax<=20 && mapx<STAGE_WIDTH &&
+	if(deltay==0 && deltax <= (5*TILE_SIZE)/12 && mapx<STAGE_WIDTH &&
 		gamestage[mapx+1][mapy].type!=NO_BLOCK &&
 		gamestage[mapx+1][mapy].type!=AIR_BLOCK &&
 		gamestage[mapx+1][mapy].state!=BLOCKSTATE_EXTINGUISHING &&
 		gamestage[mapx+1][mapy].state!=BLOCKSTATE_EXTINGUISHED
-
-
 		){
-
-
-		my_x=mapx*48;
-		if(deltax>12){
+		my_x=mapx*TILE_SIZE;
+		if(deltax > TILE_SIZE/4){
 			penaltyframe=PENALTY_FRAMES;
 			if(direction==DIR_LEFT)
 				penaltybgnum=43;//left escape
-				else
+			else
 				penaltybgnum=34;
 		}
-
 	}
-	if(deltay==0 && deltax>=28 && mapx>0 && gamestage[mapx-1][mapy].type!=NO_BLOCK &&
+	if(deltay==0 && deltax >= (7*TILE_SIZE)/12 && mapx>0 &&
+		gamestage[mapx-1][mapy].type!=NO_BLOCK &&
 		gamestage[mapx-1][mapy].type!=AIR_BLOCK &&
 		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHING &&
 		gamestage[mapx-1][mapy].state!=BLOCKSTATE_EXTINGUISHED
-
 		){
-
-
-
-			my_x=(mapx)*48;
-			if(deltax<36){
+		my_x=(mapx)*TILE_SIZE;
+		if(deltax < (TILE_SIZE*3)/4){
 			penaltyframe=PENALTY_FRAMES;
 			if(direction==DIR_LEFT)
 				penaltybgnum=44;//left escape
-				else
+			else
 				penaltybgnum=33;
 		}
-
 	}
-
 
 	return 0;
 }
@@ -568,7 +565,7 @@ int atarihantei(void){
 
 void other_move(void){
 
-	if(my_y>=(STAGE_START_Y-1)*48)airdowncount++;
+	if(my_y>=(STAGE_START_Y-1)*TILE_SIZE)airdowncount++;
 	if(airdowncount>airdownspeed){
 		airdowncount=0;
 		my_air--;
@@ -617,10 +614,10 @@ int move(void){
 	if(climbing){
 		my_y+=vy;
 		if(my_y<0)my_y=0;
-		if(my_y%48==0){
+		if(my_y%TILE_SIZE==0){
 //			my_x+=vx*7;//for walkspeed=4
 //			my_x+=vx*5;//for walkspeed=6
-			if(vx>0)my_x+=28;else my_x-=28;
+			if(vx>0)my_x+=(7*TILE_SIZE)/12;else my_x-=(7*TILE_SIZE)/12;
 			climbing=0;
 			repeat_x=0;
 		}else vy=-WALKSPEED_Y;
@@ -650,7 +647,7 @@ int move(void){
 		if ( gameinput->button[BUTTON_RIGHT]) {vx= WALKSPEED;direction=DIR_RIGHT;}
 		if ( gameinput->button[BUTTON_LEFT]) {vx=-WALKSPEED;direction=DIR_LEFT;}
 
-		if ( gameinput->button[BUTTON_0] && direction!=DIR_NONE && my_y%48==0){
+		if ( gameinput->button[BUTTON_0] && direction!=DIR_NONE && my_y%TILE_SIZE==0){
 
 			if(dig_repeat)dig=0;else{
 				dig=1;
@@ -669,20 +666,20 @@ int move(void){
 	}
 
 
-	mapx=my_x/48;
-	mapy=my_y/48;
-	if(my_x%48>=24)mapx++;
-	if(my_y%48>=24)mapy++;
+	mapx=my_x/TILE_SIZE;
+	mapy=my_y/TILE_SIZE;
+	if(my_x%TILE_SIZE >= TILE_SIZE/2)mapx++;
+	if(my_y%TILE_SIZE >= TILE_SIZE/2)mapy++;
 	p=&gamestage[mapx][mapy];
 	q=&gamestage[mapx][mapy+1];
 
-	if(my_y%48==0){
+	if(my_y%TILE_SIZE==0){
 
 		if(q->type==NO_BLOCK||q->type==AIR_BLOCK||q->state==BLOCKSTATE_EXTINGUISHING){
 			vx=0;
 			vy=WALKSPEED_Y;
 			dig=0;
-			my_x=mapx*48;
+			my_x=mapx*TILE_SIZE;
 			penaltyframe=0;
 		}
 	}else{
@@ -693,14 +690,14 @@ int move(void){
 	}
 
 
-	if(my_x%48 >=12 &&my_x%48 < 36){
+	if(my_x%TILE_SIZE >= TILE_SIZE/4 && my_x%TILE_SIZE < (TILE_SIZE*3)/4){
 		if(direction==DIR_RIGHT||direction==DIR_LEFT)dig=0;
 	}
 
-	if(vx!=0 && my_x%48==0){
+	if(vx!=0 && my_x%TILE_SIZE==0){
 
-		mapx=my_x/48;
-		mapy=my_y/48;
+		mapx=my_x/TILE_SIZE;
+		mapy=my_y/TILE_SIZE;
 
 		if(vx>0)mapx++;
 		if(vx<0)mapx--;
@@ -715,8 +712,10 @@ int move(void){
 			;
 		}else if(gamestage[mapx][mapy].type!=NO_BLOCK){
 
-			if(gamestage[my_x/48][mapy-1].type==NO_BLOCK && gamestage[my_x/48][mapy-1].state!=BLOCKSTATE_EXTINGUISHING
-			 && (gamestage[mapx][mapy-1].type==NO_BLOCK||gamestage[mapx][mapy-1].type==AIR_BLOCK)){
+			if(gamestage[my_x/TILE_SIZE][mapy-1].type==NO_BLOCK &&
+				gamestage[my_x/TILE_SIZE][mapy-1].state!=BLOCKSTATE_EXTINGUISHING &&
+				(gamestage[mapx][mapy-1].type==NO_BLOCK||gamestage[mapx][mapy-1].type==AIR_BLOCK)
+				){
 				repeat_x+=vx;
 				if(repeat_x>WALKSPEED*setting_climbwait||repeat_x<-WALKSPEED*setting_climbwait){
 					climbing=1;
@@ -729,19 +728,15 @@ int move(void){
 
 	}
 
-
 	if(dig){
-
-		digx=my_x/48;
-		if(my_x%48>=24)digx++;
-		digy=my_y/48;
+		digx=my_x/TILE_SIZE;
+		if(my_x%TILE_SIZE >= TILE_SIZE/2)digx++;
+		digy=my_y/TILE_SIZE;
 		if(direction==DIR_DOWN){
 			digy++;
-//			if(my_x%48 >= 24)digx++;
 		}else
 		if(direction==DIR_UP){
 			digy--;
-//			if(my_x%48 >= 24)digx++;
 		}else
 		if(direction==DIR_RIGHT){
 			digx++;
@@ -832,7 +827,7 @@ int keyread(void){
 
 void drawback(void){
 	int gy,y;
-	for(gy=-my_y%48,y=0;y<11;++y,gy+=48){
+	for(gy=-my_y%TILE_SIZE,y=0;y<11;++y,gy+=TILE_SIZE){
 		CBmpsBlit(cbmps_character,screen,102,0,gy);
 	}
 }
@@ -847,7 +842,7 @@ int mainloop(){
 	set_shape();
 
 	do{
-	if(my_y==(STAGE_START_Y-1)*48)CTimeReset(&gametime);
+	if(my_y==(STAGE_START_Y-1)*TILE_SIZE)CTimeReset(&gametime);
 	set_shape();
 		if(keyread())return 0;
 
@@ -899,16 +894,16 @@ int mainloop(){
 			draw_screen();
 			draw_air();
 
-			y=my_depth*100+my_y/48-STAGE_START_Y+1;
+			y=my_depth*100+my_y/TILE_SIZE-STAGE_START_Y+1;
 
 			sprintf(buf,"%4d m.",y<0?0:y);
-			CffontBlitxy(font,buf,screen,500,100);
+			CffontBlitxy(font,buf,screen,DEPTH_X,DEPTH_Y);
 
 			sprintf(buf,"%6d0",my_score);
-			CffontBlitxy(font,buf,screen,480,220);
+			CffontBlitxy(font,buf,screen,SCORE_X,SCORE_Y);
 
 			sprintf(buf,"%3d%%",my_air);
-			CffontBlitxy(font,buf,screen,500,328);
+			CffontBlitxy(font,buf,screen,AIR_NUM_X,AIR_NUM_Y);
 
 			SDL_Flip(screen);
 //			SDL_UpdateRect(screen,0,0,0,0);
@@ -919,58 +914,59 @@ int mainloop(){
 }
 
 void draw_other(void){
-
-	int gy;
-
-	static frame=0;
+	static unsigned int frame = 0;
 	frame++;
 
-	if(my_dead==1){
-
-		if(my_deadcount>20)	CBmpsBlit(cbmps_character,screen,70,61,140);
-	}
-	if(my_clear==1){
-
-		if(my_clearcount>20)	CBmpsBlit(cbmps_character,screen,72,61,140);
-	}
-	if(lap_showing){
-
-		if(lapcount%40<25)CffontBlitxy(font,lapstring,screen,0,0);
-
+	if (my_dead == 1) {
+		if (my_deadcount > 20) {
+			int x = (9 * TILE_SIZE - cbmps_character->bmp[70]->w) / 2;
+			int y = (7 * TILE_SIZE - cbmps_character->bmp[70]->h) / 2;
+			CBmpsBlit(cbmps_character, screen, 70, x, y);
+		}
 	}
 
-	if(my_y>48*90){
-		//draw
-		gy=102*48-my_y;
-		CBmpsBlit(cbmps_character,screen,120+my_depth,66,gy+20+48);
+	if (my_clear == 1) {
+		if (my_clearcount > 20) {
+			int x = (9 * TILE_SIZE - cbmps_character->bmp[72]->w) / 2;
+			int y = (7 * TILE_SIZE - cbmps_character->bmp[72]->h) / 2;
+			CBmpsBlit(cbmps_character, screen, 72, x, y);
+		}
 	}
 
-	if(my_air<25 && (frame%12/6)==0)
-		CBmpsBlit(cbmps_character,screen,111,66,50);
-
-
-	if(airminus){
-
-		CBmpsBlit(cbmps_character,screen,110,116,320);
-
+	if (lap_showing) {
+		if (lapcount % 40 < 25) {
+			CffontBlitxy(font, lapstring, screen, 0, 0);
+		}
 	}
 
+	if (my_y > TILE_SIZE * 90) {
+		SDL_Surface *label = cbmps_character->bmp[120 + my_depth];
+		int x = (9 * TILE_SIZE - label->w) / 2;
+		int y = 104 * TILE_SIZE - my_y + (5 * TILE_SIZE - label->h) / 2;
+		CBmpsBlit(cbmps_character, screen, 120 + my_depth, x, y);
+	}
 
+	if (my_air < 25 && (frame % 12) < 6) {
+		int x = (9 * TILE_SIZE - cbmps_character->bmp[111]->w) / 2;
+		int y = (4 * TILE_SIZE - cbmps_character->bmp[111]->h) / 2;
+		CBmpsBlit(cbmps_character, screen, 111, x, y);
+	}
 
-
+	if (airminus) {
+		int x = ( 9 * TILE_SIZE - cbmps_character->bmp[110]->w) / 2;
+		int y = (14 * TILE_SIZE - cbmps_character->bmp[110]->h) / 2;
+		CBmpsBlit(cbmps_character, screen, 110, x, y);
+	}
 }
-void draw_air(void){
 
-	SDL_Rect dest={486,320,100,32};
-	SDL_Rect src={0,0,100,32};
-
-	if(my_air<=0)return;
-
-	src.w=my_air;
-	dest.w=my_air;
-
-	SDL_BlitSurface(cbmps_character->bmp[103],&src,screen,&dest);
-
+void draw_air(void) {
+	SDL_Surface *bar = cbmps_character->bmp[103];
+	int width = (my_air * bar->w) / 100;
+	SDL_Rect src = { 0, 0, width, bar->h };
+	SDL_Rect dest = { AIR_BAR_X, AIR_BAR_Y, width, bar->h };
+	if (my_air > 0) {
+		SDL_BlitSurface(bar, &src, screen, &dest);
+	}
 }
 
 void draw_me(void){
@@ -1007,15 +1003,12 @@ void draw_me(void){
 		if(my_deadcount>30)i=101;
 	}
 
-//	CBmpsBlit(cbmps_character,screen,i,my_x,4*48);
-	CBmpsBlit(playerbmps,screen,i,my_x-12,4*48-12);
-
+	CBmpsBlit(playerbmps,screen,i,my_x-TILE_SIZE/4,4*TILE_SIZE-TILE_SIZE/4);
 }
 
 void draw_screen(void){
 
-	CBmpsBlit(cbmps_character,screen,100,432,0);
-//	CBmpsBlit(cbmps_character,screen,101,0,432);
+	CBmpsBlit(cbmps_character, screen, 100, SCREEN_HEIGHT - TILE_SIZE, 0);
 
 }
 
@@ -1029,9 +1022,12 @@ void stage_clear(void){
 
 	int i,x,y;
 
-	for(i=0,y=my_y/48-4;i<9;i++,y++)
-	for(x=0;x<9;x++){
-		if(gamestage[x][y].type!=NO_BLOCK)hanabiset(x,i-3,15);
+	for (i = 0, y = my_y / TILE_SIZE - 4; i < 9; i++, y++) {
+		for (x = 0; x < 9; x++) {
+			if (gamestage[x][y].type != NO_BLOCK) {
+				hanabiset(x, i - 3, 15);
+			}
+		}
 	}
 
 	my_depth++;
@@ -1041,7 +1037,7 @@ void stage_clear(void){
 
 
 
-	my_y=-2*48;
+	my_y=-2*TILE_SIZE;
 	airdownspeed-=setting_airdownspeed;
 	airdowncount=0;
 	scorerest+=my_depth*100;
@@ -1067,10 +1063,10 @@ void stage_clear(void){
 
 void game_ready(void){
 
-	my_x=4*48;
-//	my_y=(STAGE_START_Y-1)*48;
+	my_x=4*TILE_SIZE;
+//	my_y=(STAGE_START_Y-1)*TILE_SIZE;
 //	my_y=0;
-	my_y=-2*48;
+	my_y=-2*TILE_SIZE;
 
 	set_stage(4,50,1);
 //	set_stage(3,95);
@@ -1125,8 +1121,11 @@ void initialize(void){
 	playerbmps=CBmpsInit(PLAYER_NUM);
 
 
-
-	font=CffontInitDefault16("engrave16.bmp");
+	#define FONT_INIT_FUNC_FOR_SIZE_INNER(SIZE) CffontInitDefault ## SIZE
+	#define FONT_INIT_FUNC_FOR_SIZE(SIZE) FONT_INIT_FUNC_FOR_SIZE_INNER(SIZE)
+	font=FONT_INIT_FUNC_FOR_SIZE(FONT_SIZE)(fontfile);
+	#undef FONT_INIT_FUNC_FOR_SIZE_INNER
+	#undef FONT_INIT_FUNC_FOR_SIZE
 
 	CAudioInitDefault();
 	wavs=CWavsInit(WAVMAX);
@@ -1328,9 +1327,9 @@ void draw(void){
 	TBlockState *p;
 
 	int alpha=0;
-	delta_y=my_y%48;
+	delta_y=my_y%TILE_SIZE;
 
-	for(gy=-delta_y,y=my_y/48-4;y<=my_y/48+7;++y,gy+=48){
+	for(gy=-delta_y,y=my_y/TILE_SIZE-4;y<=my_y/TILE_SIZE+7;++y,gy+=TILE_SIZE){
 		if(y<0||y>=GAME_STAGE_HEIGHT)continue;
 		for(x=0;x<STAGE_WIDTH;x++){
 		alpha=0;
@@ -1339,36 +1338,36 @@ void draw(void){
 
 			if(p->type==HARD_BLOCK){
 				alpha=p->destroycount;
-//				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48+p->lefttime%6-3,gy-p->left);
+//				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*TILE_SIZE+p->lefttime%6-3,gy-p->left);
 			}else if(p->type==AIR_BLOCK){
-//				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48+p->lefttime%6-3,gy-p->left);
+//				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*TILE_SIZE+p->lefttime%6-3,gy-p->left);
 
 
 			}else{
 				switch(p->state){
 					case BLOCKSTATE_FALLING:
-					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48,gy-p->left);
+					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*TILE_SIZE,gy-p->left);
 					break;
 
 					case BLOCKSTATE_PREFALL:
-					if(p->lefttime<66)
-//					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48-p->lefttime%8+4,gy);
-					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48+vibration[p->lefttime],gy);
-					else
-					BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48,gy);
+					if(p->lefttime<66){
+						BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*TILE_SIZE+vibration[p->lefttime],gy);
+					}else{
+						BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*TILE_SIZE,gy);
+					}
 					break;
 
 					case BLOCKSTATE_EXTINGUISHING:
-						CBmpsBlit(cbmps_character,screen,109-p->extinguishingframe/4,x*48,gy);
+						CBmpsBlit(cbmps_character,screen,109-p->extinguishingframe/4,x*TILE_SIZE,gy);
 					break;
 
 					case BLOCKSTATE_EXTINGUISHED:
-						CBmpsBlit(cbmps_character,screen,109,x*48,gy);
+						CBmpsBlit(cbmps_character,screen,109,x*TILE_SIZE,gy);
 					break;
 
 
 					default:
-				BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*48,gy);
+				BlitForBlock(cbmps_blocks->bmp[p->type],screen,p->shape,x*TILE_SIZE,gy);
 				}
 
 
@@ -1379,25 +1378,26 @@ void draw(void){
 
 			switch(p->state){
 				case BLOCKSTATE_FALLING:
-				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48,gy-p->left);
+				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*TILE_SIZE,gy-p->left);
 				break;
 
 				case BLOCKSTATE_PREFALL:
-				if(p->lefttime<66)
-				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48+vibration[p->lefttime],gy);
-				else
-				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48,gy);
+				if(p->lefttime<66){
+					CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*TILE_SIZE+vibration[p->lefttime],gy);
+				}else{
+					CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*TILE_SIZE,gy);
+				}
 				break;
 
 				case BLOCKSTATE_EXTINGUISHING:
-					CBmpsBlit(cbmps_character,screen,109-p->extinguishingframe/4,x*48,gy);
+					CBmpsBlit(cbmps_character,screen,109-p->extinguishingframe/4,x*TILE_SIZE,gy);
 				break;
 
 				case BLOCKSTATE_EXTINGUISHED:
-					CBmpsBlit(cbmps_character,screen,109,x*48,gy);
+					CBmpsBlit(cbmps_character,screen,109,x*TILE_SIZE,gy);
 				break;
 				default:
-				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*48,gy);
+				CBmpsBlit(cbmps_blocks,screen,p->type+alpha,x*TILE_SIZE,gy);
 			}
 
 		}
@@ -1922,7 +1922,7 @@ void blockprocess(void){
 					p->state=BLOCKSTATE_NONE;
 
 					q->state=BLOCKSTATE_FALLING;
-					q->left=48-WALKSPEED_Y;
+					q->left=TILE_SIZE-WALKSPEED_Y;
 
 				}
 			}break;
@@ -1989,10 +1989,10 @@ void drawhanabi(void){
 			p->avail=0;
 			continue;
 		}
-		gy=(p->y+4)*48-my_y;
-		if(gy>-48 && gy<640){
+		gy=(p->y+4)*TILE_SIZE-my_y;
+		if(gy>-TILE_SIZE && gy<SCREEN_WIDTH){
 			//draw
-			CBmpsBlit(cbmps_character,screen,109-p->time/3,p->x*48,gy);
+			CBmpsBlit(cbmps_character,screen,109-p->time/3,p->x*TILE_SIZE,gy);
 
 		}else{
 			p->avail=0;
@@ -2131,10 +2131,10 @@ int title(void){
 			drawTilescroll();
 			CBmpsBlit(cbmps_character,screen,50,0,0);
 			for(i=0;i<3;++i){
-				if(y==i)
-					CBmpsBlit(cbmps_character,screen,60+i,180+dx[nx++],300+i*30);
-				else
-					CBmpsBlit(cbmps_character,screen,60+i,180,300+i*30);
+				int mx = MAIN_MENU_OPTIONS_X;
+				int my = MAIN_MENU_OPTIONS_Y + i * MAIN_MENU_OPTIONS_DY;
+				if (y == i) mx += dx[nx++];
+				CBmpsBlit(cbmps_character, screen, 60 + i, mx, my);
 			}
 			nx=nx%maxx;
 			SDL_Flip(screen);
@@ -2284,14 +2284,10 @@ int move_nameentry(void){
 	return 0;
 }
 
-int draw_nameentry(void){
-
-	char buf[4096];
-
-
-	CffontBlitxy(font,nameentry_moji,screen,5+308-nameentry_x*16,300+5);
-	CBmpsBlit(cbmps_character,screen,53,0,0);
-
+int draw_nameentry(void) {
+	CffontBlitxy(font, nameentry_moji, screen,
+			HIGHSCORE_MARK_X - nameentry_x * FONT_SIZE, HIGHSCORE_MARK_Y);
+	CBmpsBlit(cbmps_character, screen, 53, 0, 0);
 }
 
 int nameentry(void){
@@ -2334,8 +2330,10 @@ int nameentry(void){
 
 				);
 			}
-			CffontBlitxy(font,buffer,screen,70,25+150);
-			CffontBlitxy(font,scoreboard,screen,70,150);
+			CffontBlitxy(font, buffer, screen,
+					HIGHSCORE_TEXT_X, HIGHSCORE_SCORE_Y);
+			CffontBlitxy(font, scoreboard, screen,
+					HIGHSCORE_TEXT_X, HIGHSCORE_LABEL_Y);
 
 			draw_nameentry();
 
@@ -2402,19 +2400,18 @@ int highscore(void){
 
 			if(mode==0){
 				CBmpsBlit(cbmps_character,screen,51,0,0);
-				CffontBlitxy(font,scoreboard,screen,130,120);
+				CffontBlitxy(font,scoreboard,screen,SCOREBOARD_X,SCOREBOARD_LABEL_Y);
 			}else{
 				CBmpsBlit(cbmps_character,screen,54,0,0);
-				CffontBlitxy(font,scoreboard_fast,screen,130,120);
+				CffontBlitxy(font,scoreboard_fast,screen,SCOREBOARD_X,SCOREBOARD_LABEL_Y);
 			}
 
 			for(i=0;i<SCOREMEMBER;++i){
-
+				int y = SCOREBOARD_SCORE_Y + i * SCOREBOARD_SCORE_DY;
 				if(mode==0){
-					CffontBlitxy(font,buf[i],screen,130,i*25+150);
+					CffontBlitxy(font,buf[i],screen,SCOREBOARD_X,y);
 				}else{
-					CffontBlitxy(font,buf_fast[i],screen,130,i*25+150);
-
+					CffontBlitxy(font,buf_fast[i],screen,SCOREBOARD_X,y);
 				}
 			}
 
@@ -2571,44 +2568,34 @@ void joy_final(void){
 
 
 int BlitForBlock(SDL_Surface *p,SDL_Surface *dest,int num,int x,int y){
+	SDL_Rect dr = { x, y, TILE_SIZE, TILE_SIZE };
+	SDL_Rect rects[] = {
+		{             0,             0, TILE_SIZE, TILE_SIZE },
+		{     TILE_SIZE,             0, TILE_SIZE, TILE_SIZE },
+		{             0, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{     TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
 
-	SDL_Rect dr;
-	int i;
-	SDL_Rect rects[]={
-		{  0,  0,48,48},
-		{ 48,  0,48,48},
-		{  0,144,48,48},
-		{ 48,144,48,48},
+		{ 3 * TILE_SIZE,             0, TILE_SIZE, TILE_SIZE },
+		{ 2 * TILE_SIZE,             0, TILE_SIZE, TILE_SIZE },
+		{ 3 * TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{ 2 * TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
 
-		{144,  0,48,48},
-		{ 96,  0,48,48},
-		{144,144,48,48},
-		{ 96,144,48,48},
+		{             0,     TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{     TILE_SIZE,     TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{             0, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{     TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
 
-		{  0, 48,48,48},
-		{ 48, 48,48,48},
-		{  0, 96,48,48},
-		{ 48, 96,48,48},
-
-		{144, 48,48,48},
-		{ 96, 48,48,48},
-		{144, 96,48,48},
-		{ 96, 96,48,48},
-
-
+		{ 3 * TILE_SIZE,     TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{ 2 * TILE_SIZE,     TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{ 3 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
+		{ 2 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE },
 	};
 
 	if(p==NULL)return(-1);
 
-	dr.w=rects[num].w;
-	dr.h=rects[num].h;
-	dr.x=x;
-	dr.y=y;
-
 	SDL_BlitSurface(p,&rects[num],dest,&dr);
 
 	return 0;
-
 }
 
 //Œ`‚ð®‚¦‚é

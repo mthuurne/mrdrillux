@@ -38,6 +38,7 @@ void CffontSetupFromFireworks(Cffont *this,int size){
 	SDL_Rect *w;
 	int space_x=16,space_y=16,plus=96;
 
+	if(size==8){space_x=31;space_y=31;plus=128;}
 	if(size==16){space_x=15;space_y=15;plus=96;}
 	if(size==32){space_x=7;space_y=7;plus=64;}
 
@@ -69,11 +70,15 @@ printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
 
 }
 
+//8x8 bitmaped font loading func
+Cffont* CffontInitDefault8(char *filename){
+	return CffontInit(filename,8,8,0x0ff,0,0x0ff);
+}
 //16x16 bitmaped font loading func
 Cffont* CffontInitDefault16(char *filename){
 	return CffontInit(filename,16,16,0x0ff,0,0x0ff);
 }
-//16x16 bitmaped font loading func
+//32x32 bitmaped font loading func
 Cffont* CffontInitDefault32(char *filename){
 	return CffontInit(filename,32,32,0x0ff,0,0x0ff);
 }

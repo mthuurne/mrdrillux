@@ -28,6 +28,7 @@ typedef struct{
 
 void CffontFree(Cffont *);
 Cffont* CffontInit(char *,int ,int ,int ,int ,int );
+Cffont* CffontInitDefault8(char *);
 Cffont* CffontInitDefault16(char *);
 Cffont* CffontInitDefault32(char *);
 void CffontSetup(Cffont *);
