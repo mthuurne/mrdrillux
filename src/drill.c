@@ -9,12 +9,18 @@ a simple game like the Mr.Driller.(c) namco
 coding is restarted from 2000/8/28
 */
 
-#include "drill.h"
 #include "geometry.h"
 #include "Cffont.h"
 #include "CTime.h"
 #include "CInput.h"
+#include "CBmps.h"
 #include "CWavs.h"
+
+#include "SDL.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 CWavs *wavs;
 #define WAVMAX	100
