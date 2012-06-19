@@ -37,5 +37,5 @@ void CTimeReset(CTime *p) {
 }
 
 void CTimeChangeFPS(CTime *p, int fpsmax) {
-	p->interval=( 65536.0*1000.0/fpsmax );
+	p->interval = (65536 * 1000) / fpsmax;
 }
