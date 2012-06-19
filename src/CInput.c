@@ -31,7 +31,7 @@ void CInputFree(CInput *this){
 	free(this);
 }
 
-int CInputUpdate(CInput *this,int disabled){
+void CInputUpdate(CInput *this,int disabled){
 
 	int i;
 	Uint8 *keys;

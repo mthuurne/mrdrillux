@@ -42,7 +42,7 @@ CInput* CInputInit(int,int);
 void CInputHoldArrows(CInput *);
 void CInputUnholdArrows(CInput *);
 void CInputDefaultSetting(CInput *this);
-int CInputUpdate(CInput *this,int);
+void CInputUpdate(CInput *this,int);
 void CInputFree(CInput *this);
 void CInputHoldButtons(CInput *);
 void CInputUnholdButtons(CInput *);
