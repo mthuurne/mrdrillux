@@ -7,30 +7,6 @@ text put structures for SDL
 #include "Cffont.h"
 #include "SDL.h"
 /*private funcs for init*/
-void CffontSetup(Cffont *this){
-
-	int i;
-	int x,y;
-	SDL_Rect *w;
-
-printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
-	x=0;
-	y=0;
-	w=this->fontarea;
-	for(i=0;i<N_ASCII;++i,++w){
-		w->w=this->width;
-		w->h=this->height;
-		w->x=x;
-		w->y=y;
-		x+=this->width;
-		if(x>=this->font->w){
-			x=0;
-			y+=this->height;
-		}
-	}
-
-}
-
 void CffontSetupFromFireworks(Cffont *this,int size){
 
 	int i;
@@ -43,7 +19,7 @@ void CffontSetupFromFireworks(Cffont *this,int size){
 	if(size==32){space_x=7;space_y=7;plus=64;}
 
 
-printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
+	//printf("%d,%d,%d,%d\n",this->width,this->height,this->font->w,this->font->h);
 	x=0;
 	y=0;
 	w=this->fontarea;
