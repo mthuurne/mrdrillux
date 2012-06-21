@@ -878,7 +878,7 @@ void draw_other(void){
 
 	if (my_dead == 1) {
 		if (my_deadcount > 20) {
-			int x = (9 * TILE_SIZE - cbmps_character->bmp[70]->w) / 2;
+			int x = (STAGE_WIDTH * TILE_SIZE - cbmps_character->bmp[70]->w) / 2;
 			int y = (7 * TILE_SIZE - cbmps_character->bmp[70]->h) / 2;
 			CBmpsBlit(cbmps_character, screen, 70, x, y);
 		}
@@ -886,7 +886,7 @@ void draw_other(void){
 
 	if (my_clear == 1) {
 		if (my_clearcount > 20) {
-			int x = (9 * TILE_SIZE - cbmps_character->bmp[72]->w) / 2;
+			int x = (STAGE_WIDTH * TILE_SIZE - cbmps_character->bmp[72]->w) / 2;
 			int y = (7 * TILE_SIZE - cbmps_character->bmp[72]->h) / 2;
 			CBmpsBlit(cbmps_character, screen, 72, x, y);
 		}
@@ -900,19 +900,19 @@ void draw_other(void){
 
 	if (my_y > TILE_SIZE * 90) {
 		SDL_Surface *label = cbmps_character->bmp[120 + my_depth];
-		int x = (9 * TILE_SIZE - label->w) / 2;
+		int x = (STAGE_WIDTH * TILE_SIZE - label->w) / 2;
 		int y = 104 * TILE_SIZE - my_y + (5 * TILE_SIZE - label->h) / 2;
 		CBmpsBlit(cbmps_character, screen, 120 + my_depth, x, y);
 	}
 
 	if (my_air < 25 && (frame % 12) < 6) {
-		int x = (9 * TILE_SIZE - cbmps_character->bmp[111]->w) / 2;
+		int x = (STAGE_WIDTH * TILE_SIZE - cbmps_character->bmp[111]->w) / 2;
 		int y = (4 * TILE_SIZE - cbmps_character->bmp[111]->h) / 2;
 		CBmpsBlit(cbmps_character, screen, 111, x, y);
 	}
 
 	if (airminus) {
-		int x = ( 9 * TILE_SIZE - cbmps_character->bmp[110]->w) / 2;
+		int x = (STAGE_WIDTH * TILE_SIZE - cbmps_character->bmp[110]->w) / 2;
 		int y = (14 * TILE_SIZE - cbmps_character->bmp[110]->h) / 2;
 		CBmpsBlit(cbmps_character, screen, 110, x, y);
 	}
