@@ -23,13 +23,15 @@ TOOLCHAIN:=$(TOOLCHAIN_$(PLATFORM))
 EXEEXT:=$(EXEEXT_$(PLATFORM))
 RES:=$(RES_$(PLATFORM))
 
-CFLAGS:=-O2 -g -DTILE_SIZE=$(RES)
+CFLAGS:=-O2 -g -Wall
 LDFLAGS:=
 
 SDL_CONFIG:=$(if $(TOOLCHAIN),$(TOOLCHAIN)/usr/bin/,)sdl-config
 CFLAGS+=$(shell $(SDL_CONFIG) --cflags)
 LDFLAGS+=$(shell $(SDL_CONFIG) --libs)
 LDFLAGS+=-lSDL_mixer
+
+CFLAGS+=-DTILE_SIZE=$(RES)
 
 OUTDIR:=output/$(PLATFORM)
 
