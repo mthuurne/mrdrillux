@@ -240,7 +240,8 @@ CInput *gameinput=NULL;
 
 name entry
 **/
-char nameentry_moji[]="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghjklmnopqrstuvwxyz .";
+char nameentry_moji[] =
+	"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .";
 int nameentry_x;
 int nameentry_vx;
 int nameentry_x_wait;
