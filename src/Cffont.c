@@ -96,9 +96,6 @@ void CffontFree(Cffont *this){
 }
 
 
-int CffontBlit(Cffont *this,char *string,SDL_Surface *surf){
-	return CffontBlitxy(this,string,surf,0,0);
-}
 int CffontBlitxy(Cffont *this,char *string,SDL_Surface *surf,int x,int y){
 	SDL_Rect src,dest;
 	while(*string!=0){

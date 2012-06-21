@@ -31,7 +31,6 @@ Cffont* CffontInit(char *,int ,int ,int ,int ,int );
 Cffont* CffontInitDefault8(char *);
 Cffont* CffontInitDefault16(char *);
 Cffont* CffontInitDefault32(char *);
-int CffontBlit(Cffont *,char *,SDL_Surface *);
 int CffontBlitxy(Cffont *,char *,SDL_Surface *,int ,int );
 void CffontSetupFromFireworks(Cffont*,int);
 
