@@ -78,9 +78,7 @@ char *otherfile="otherbg.txt";
 #define BLOCKSTATE_PREFALL	2
 #define BLOCKSTATE_EXTINGUISHING	3
 #define BLOCKSTATE_FALLFINISHED	4
-#define BLOCKSTATE_PREEXTINGUISHING	5
-#define BLOCKSTATE_EXTINGUISHED	6
-#define BLOCKSTATE_FALLSTOP	7
+#define BLOCKSTATE_EXTINGUISHED	5
 
 typedef struct{
 	int state;
@@ -109,9 +107,6 @@ typedef struct{
 TBlockState gamestage[GAME_STAGE_WIDTH][GAME_STAGE_HEIGHT];
 
 #define STAGE_WIDTH 9
-#define STAGE_HEIGHT 9
-#define STAGE_X	0
-#define STAGE_Y	0
 
 
 /**
@@ -169,7 +164,7 @@ typedef struct{
 	int x;
 	int y;
 	SDL_Surface *bmp;
-	int clock;
+	unsigned int clock;
 
 }CTileScroll;
 
@@ -239,7 +234,6 @@ char setting_playerdir[1024]="./player/";
 
 /* joysticj control */
 //SDL_Joystick *joystick=NULL;
-#define JOYLIMIT	1000
 CInput *gameinput=NULL;
 
 /**
@@ -340,6 +334,9 @@ void set_shape(void);
 
 
 int main(int argc, char **argv) {
+	(void)argc;
+	(void)argv;
+
 	load_setting();
 
 	initialize();
@@ -1970,7 +1967,7 @@ int hanabiset(int x,int y,int n){
 void moveTilescroll(void){
 
 	CTileScroll *p;
-	int interval=66;//milisec
+	unsigned int interval=66;//milisec
 	p=&tscroll;
 
 	if(p->clock+interval<gametime.clock){
@@ -2150,7 +2147,7 @@ int move_nameentry(void) {
 	if (nameentry_x_wait == 0) {
 		CInputUpdate(gameinput,0);
 
-		if ( (gameinput->button[BUTTON_RIGHT]) && nameentry_x<sizeof(nameentry_moji)-2 ) {nameentry_x_wait=8;nameentry_vx=1;}
+		if ( (gameinput->button[BUTTON_RIGHT]) && nameentry_x<(int)sizeof(nameentry_moji)-2 ) {nameentry_x_wait=8;nameentry_vx=1;}
 		if ( (gameinput->button[BUTTON_LEFT]) && nameentry_x>0 ) {nameentry_x_wait=8;nameentry_vx=-1;}
 
 		if ( gameinput->button[BUTTON_2] ){

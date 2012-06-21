@@ -23,7 +23,7 @@ TOOLCHAIN:=$(TOOLCHAIN_$(PLATFORM))
 EXEEXT:=$(EXEEXT_$(PLATFORM))
 RES:=$(RES_$(PLATFORM))
 
-CFLAGS:=-O2 -g -Wall
+CFLAGS:=-O2 -g -Wall -Wextra -Wundef -Wunused-macros
 LDFLAGS:=
 
 SDL_CONFIG:=$(if $(TOOLCHAIN),$(TOOLCHAIN)/usr/bin/,)sdl-config
