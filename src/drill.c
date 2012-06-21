@@ -17,6 +17,7 @@ coding is restarted from 2000/8/28
 #include "CWavs.h"
 
 #include "SDL.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -268,7 +269,7 @@ void game_ready(void);
 void draw_me(void);
 
 int mainloop();
-int move(void);
+void move(void);
 int keyread(void);
 
 int erase_block(void);
@@ -307,10 +308,10 @@ int highscore(void);
 
 int THighScoreLoad(THighScore *p,char *filename);
 int THighScoreSave(THighScore *p,char *filename);
-int THighScoreAdd(THighScore *p,char *name,int time,int depth,int score);
-int THighScoreSortByTime(THighScore *p);
-int THighScoreSortByScore(THighScore *p);
-int THighScoreSortByDepth(THighScore *p);
+void THighScoreAdd(THighScore *p,char *name,int time,int depth,int score);
+void THighScoreSortByTime(THighScore *p);
+void THighScoreSortByScore(THighScore *p);
+void THighScoreSortByDepth(THighScore *p);
 void THighScoreSwap(THighScore *p,int i,int j);
 
 void erase_check_recursive(int x,int y,int type,int *answer,int *number);
@@ -323,8 +324,8 @@ void draw_other(void);
 void gameclear(void);
 void load_setting(void);
 
-int nameentry(void);
-int draw_nameentry(void);
+void nameentry(void);
+void draw_nameentry(void);
 int move_nameentry(void);
 int init_nameentry(int score,int depth,int playtime);
 
@@ -588,15 +589,11 @@ void other_move(void){
 
 }
 
-int move(void){
+void move(void){
 	int mapx,mapy;
 	int digx,digy;
-	Uint8 *keys;
-	TBlockState *p,*q;
+	TBlockState *q;
 
-//	int joy_up=0,joy_down=0,joy_left=0,joy_right=0,joy_space=0,joy_cancel=0;
-
-	//if(erase_block());//CWavsPlay(wavs,12);
 	erase_block();
 	erase_check();
 
@@ -618,38 +615,25 @@ int move(void){
 		}else vy=-WALKSPEED_Y;
 		return;
 	}else{
-	vx=0;
-	vy=0;
-	dig=0;
+		vx=0;
+		vy=0;
+		dig=0;
 		if(!my_dead && !my_clear && penaltyframe==0){
-
 			CInputUpdate(gameinput,0);
 		}else{
 			CInputUpdate(gameinput,1);
-
 		}
-//			keys = SDL_GetKeyState(NULL);
-/*
-			if(joystick && SDL_JoystickGetButton(joystick, setting_joyconfirm) == SDL_PRESSED)joy_space=1;
-			if(joystick && (int)SDL_JoystickGetAxis(joystick, 1) < -setting_joyaxismax)joy_up=1;
-			if(joystick && (int)SDL_JoystickGetAxis(joystick, 1) > setting_joyaxismax)joy_down=1;
-			if(joystick && (int)SDL_JoystickGetAxis(joystick, 0) > setting_joyaxismax)joy_right=1;
-			if(joystick && (int)SDL_JoystickGetAxis(joystick, 0) < -setting_joyaxismax)joy_left=1;
-		}
-		*/
 		if ( gameinput->button[BUTTON_UP]){direction=DIR_UP;}
 		if ( gameinput->button[BUTTON_DOWN]) {direction=DIR_DOWN;}
 		if ( gameinput->button[BUTTON_RIGHT]) {vx= WALKSPEED;direction=DIR_RIGHT;}
 		if ( gameinput->button[BUTTON_LEFT]) {vx=-WALKSPEED;direction=DIR_LEFT;}
 
 		if ( gameinput->button[BUTTON_0] && direction!=DIR_NONE && my_y%TILE_SIZE==0){
-
 			if(dig_repeat)dig=0;else{
 				dig=1;
 				dig_graphic=1;
 				dig_repeat=1;
 			}
-
 		}else{
 			dig_repeat=0;
 		}
@@ -660,12 +644,10 @@ int move(void){
 		penaltyframe--;
 	}
 
-
 	mapx=my_x/TILE_SIZE;
 	mapy=my_y/TILE_SIZE;
 	if(my_x%TILE_SIZE >= TILE_SIZE/2)mapx++;
 	if(my_y%TILE_SIZE >= TILE_SIZE/2)mapy++;
-	p=&gamestage[mapx][mapy];
 	q=&gamestage[mapx][mapy+1];
 
 	if(my_y%TILE_SIZE==0){
@@ -790,34 +772,24 @@ int keyread(void){
 	while(SDL_PollEvent(&ev)){
 		switch(ev.type){
 			case SDL_QUIT:
-			{
 				return 1;
-			}
-			break;
 			case SDL_KEYDOWN: {
 				key=&(ev.key.keysym.sym);
 
 				if(*key==293){//F12
-
 					sprintf(buf,"screenshot%04d.bmp",screennumber++);
 					if(screennumber>9999)screennumber=0;
 					SDL_SaveBMP(screen,buf);
-
 				}
 
 				if(*key==27){//ESC
-
 					return 1;
 				}
-
 			}break;
-
 		}
 	}
 
-
 	return 0;
-
 }
 
 void drawback(void){
@@ -828,7 +800,6 @@ void drawback(void){
 }
 
 int mainloop(){
-
 	int y;
 
 	char buf[4096];
@@ -837,33 +808,29 @@ int mainloop(){
 	set_shape();
 
 	do{
-	if(my_y==(STAGE_START_Y-1)*TILE_SIZE)CTimeReset(&gametime);
-	set_shape();
+		if(my_y==(STAGE_START_Y-1)*TILE_SIZE)CTimeReset(&gametime);
+		set_shape();
 		if(keyread())return 0;
 
 		if(lap_showing){
-
 			lapcount++;
 			if(lapcount>300)lap_showing=0;
-
 		}
-		if(airminus){
 
+		if(airminus){
 			airminuscount++;
 			if(airminuscount>80)airminus=0;
-
 		}
 
 		if(my_dead){
-
 			my_deadcount++;
 			if(my_deadcount>250){
 				gameover();
 				break;
 			}
 		}
-		if(my_clear){
 
+		if(my_clear){
 			my_clearcount++;
 			if(my_clearcount>300){
 				gameclear();
@@ -905,7 +872,7 @@ int mainloop(){
 		}
 		CTimeWait(&gametime);
 	}while(1);
-	return (1);
+	return 1;
 }
 
 void draw_other(void){
@@ -975,6 +942,9 @@ void draw_me(void){
 		case DIR_LEFT:i=40;break;
 		case DIR_DOWN:i=10;break;
 		case DIR_UP:i=20;break;
+		default:
+			assert(0);
+			i=10;
 	}
 	if(dig_graphic==0 && movingframe>0){
 		j=movingframe/2;
@@ -1213,7 +1183,7 @@ void set_stage_startingpoint(void){
 }
 void set_stage(int number,int percentage,int blockstyle){
 
-	int x,y,i;
+	int x,y;
 	TBlockState *p;
 	int range;
 
@@ -1296,7 +1266,7 @@ void set_stage(int number,int percentage,int blockstyle){
 void draw(void){
 
 
-	int x,y,i,gy;
+	int x,y,gy;
 
 	int delta_y;
 
@@ -1538,7 +1508,6 @@ void search_number(int x,int y,int type,int *number){
 void search_fall(int x,int y,int type,int *checksheat,int *checkleft){
 
 	TBlockState *p,*q;
-	int flag=0;
 	p=&gamestage[x][y];
 
 	if(p->done)return;
@@ -1568,10 +1537,7 @@ void search_fall(int x,int y,int type,int *checksheat,int *checkleft){
 }
 
 void setprefall(int x,int y,int type,int left){
-	TBlockState *p,*q;
-
-	p=&gamestage[x][y];
-	q=&gamestage[x][y+1];
+	TBlockState *p=&gamestage[x][y];
 
 	if(p->done_sub)return;
 	if(p->type != type)return;
@@ -1600,10 +1566,7 @@ void setprefall(int x,int y,int type,int left){
 
 }
 void unsetprefall(int x,int y,int type){
-	TBlockState *p,*q;
-
-	p=&gamestage[x][y];
-	q=&gamestage[x][y+1];
+	TBlockState *p=&gamestage[x][y];
 
 	if(p->done)return;
 	if(p->type != type)return;
@@ -1622,10 +1585,7 @@ void unsetprefall(int x,int y,int type){
 
 }
 void unsetprefallfinished(int x,int y,int type){
-	TBlockState *p,*q;
-
-	p=&gamestage[x][y];
-	q=&gamestage[x][y+1];
+	TBlockState *p=&gamestage[x][y];
 
 	if(p->done)return;
 	if(p->type != type)return;
@@ -1648,10 +1608,8 @@ void unsetprefallfinished(int x,int y,int type){
 
 //連鎖チェック
 void erase_check_recursive(int x,int y,int type,int *answer,int *number){
+	TBlockState *p=&gamestage[x][y];
 
-	TBlockState *p;
-
-	p=&gamestage[x][y];
 	if(p->done)return;
 	if(p->type != type)return;
 	p->done=1;
@@ -1670,10 +1628,7 @@ void erase_check_recursive(int x,int y,int type,int *answer,int *number){
 }
 
 void seterase_recursive(int x,int y,int type){
-	TBlockState *p,*q;
-
-	p=&gamestage[x][y];
-	q=&gamestage[x][y+1];
+	TBlockState *p=&gamestage[x][y];
 
 	if(p->done_sub)return;
 	if(p->type != type)return;
@@ -1694,14 +1649,16 @@ void seterase_recursive(int x,int y,int type){
 
 }
 void erase_check(void){
+	int x,y;
 
-	int x,y,answer,number;
-	TBlockState *p,*q;
 	clear_blockflag_sub();
 	clear_blockflag();
+
 	for(y=GAME_STAGE_HEIGHT-5;y>=1;y--)
 	for(x=0;x<GAME_STAGE_WIDTH;x++){
-		p=&gamestage[x][y];
+		int answer, number;
+		TBlockState *p=&gamestage[x][y];
+
 		if(p->done)continue;
 		if(p->type == NO_BLOCK||p->type==AIR_BLOCK)continue;
 		if(p->state == BLOCKSTATE_FALLING /*|| p->state == BLOCKSTATE_PREFALL*/)continue;
@@ -1712,9 +1669,7 @@ void erase_check(void){
 			seterase_recursive(x,y,p->type);
 			CWavsPlay(wavs,12);
 		}
-
 	}
-
 }
 
 void prefallcheck(void ){
@@ -1808,7 +1763,6 @@ void prefallcheck(void ){
 void leftcheck(int x,int y,int type,int *checkleft,int *check){
 
 	TBlockState *p,*q;
-	int flag=0;
 	int lefttime;
 	p=&gamestage[x][y];
 	q=&gamestage[x][y+1];
@@ -1860,10 +1814,7 @@ void leftcheck(int x,int y,int type,int *checkleft,int *check){
 }
 
 void setleft(int x,int y,int type,int left){
-	TBlockState *p,*q;
-
-	p=&gamestage[x][y];
-	q=&gamestage[x][y-1];
+	TBlockState *p=&gamestage[x][y];
 
 	if(p->done_sub)return;
 	if(p->type != type)return;
@@ -1889,10 +1840,9 @@ void setleft(int x,int y,int type,int left){
 
 //block processing
 void blockprocess(void){
-
-	int x,y,check;
-	int number;
+	int x,y;
 	TBlockState *p,*q;
+
 	clear_blockflag();
 	for(y=GAME_STAGE_HEIGHT-1;y>=0;y--)
 	for(x=0;x<GAME_STAGE_WIDTH;x++){
@@ -2049,9 +1999,8 @@ void drawTilescroll(void){
 }
 
 int title(void){
-	Uint8 *keys;
 //	int joy_up=0,joy_down=0,joy_left=0,joy_right=0,joy_space=0,joy_cancel=0;
-	int x[3],y=0,i;
+	int y = 0, i;
 	int dx[]={
 		0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,
 		0,1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1
@@ -2155,8 +2104,6 @@ char highscoretemp_name[4];
 
 
 int init_nameentry(int score,int depth,int playtime){
-
-
 	int i;
 
 	nameentry_x=0;
@@ -2165,7 +2112,6 @@ int init_nameentry(int score,int depth,int playtime){
 	bs_repeat=0;
 	nameentry_vx=0;
 	name_x=0;
-
 
 	highscoretemp_score=score;
 	highscoretemp_depth=depth;
@@ -2181,8 +2127,6 @@ int init_nameentry(int score,int depth,int playtime){
 	}
 	highscoretemp_entrynumber_score=i;
 
-
-
 	THighScoreAdd(&fasttimedata,"___",playtime,depth,score);
 	THighScoreSortByDepth(&fasttimedata);
 	THighScoreSortByScore(&fasttimedata);
@@ -2193,37 +2137,18 @@ int init_nameentry(int score,int depth,int playtime){
 	}
 	highscoretemp_entrynumber_time=i;
 
-
-
 	if(highscoretemp_entrynumber_score==SCOREMEMBER&&
 	highscoretemp_entrynumber_time==SCOREMEMBER)return -1;//highsore is not marked!
 
 	strcpy(highscoretemp_name,"___");
 	CWavsPlayMusicStyle(wavs,2);
 
-
 	return i;
-
 }
 
-int move_nameentry(void){
-
-	Uint8 *keys;
-//	int joy_up=0,joy_down=0,joy_left=0,joy_right=0,joy_space=0,joy_cancel=0;
-
-
-	if(nameentry_x_wait==0)keys = SDL_GetKeyState(NULL);
-	if(nameentry_x_wait==0){
-
-
+int move_nameentry(void) {
+	if (nameentry_x_wait == 0) {
 		CInputUpdate(gameinput,0);
-		/*
-		if(joystick && SDL_JoystickGetButton(joystick, setting_joyconfirm) == SDL_PRESSED)joy_space=1;
-		if(joystick && SDL_JoystickGetButton(joystick, setting_joycancel) == SDL_PRESSED)joy_cancel=1;
-		if(joystick && (int)SDL_JoystickGetAxis(joystick, 0) > setting_joyaxismax)joy_right=1;
-		if(joystick && (int)SDL_JoystickGetAxis(joystick, 0) < -setting_joyaxismax)joy_left=1;
-		*/
-
 
 		if ( (gameinput->button[BUTTON_RIGHT]) && nameentry_x<sizeof(nameentry_moji)-2 ) {nameentry_x_wait=8;nameentry_vx=1;}
 		if ( (gameinput->button[BUTTON_LEFT]) && nameentry_x>0 ) {nameentry_x_wait=8;nameentry_vx=-1;}
@@ -2236,34 +2161,22 @@ int move_nameentry(void){
 			return 1;
 		}
 		if (gameinput->button[BUTTON_0]){
-
-			if(space_repeat);else{
-
-
+			if (!space_repeat) {
 				if(name_x<3){
-
 					highscoretemp_name[name_x]=nameentry_moji[nameentry_x];
 					name_x++;
-				};
-
-
+				}
 				space_repeat=1;
 			}
-
 		}else{
 			space_repeat=0;
 		}
 		if ( gameinput->button[BUTTON_1] ){
-
-			if(bs_repeat);else{
-
+			if(!bs_repeat){
 				if(name_x>0)name_x--;
 				highscoretemp_name[name_x]=' ';
-
-
 				bs_repeat=1;
 			}
-
 		}else{
 			bs_repeat=0;
 		}
@@ -2276,19 +2189,19 @@ int move_nameentry(void){
 			nameentry_vx=0;
 		}
 	}
+
 	return 0;
 }
 
-int draw_nameentry(void) {
+void draw_nameentry(void) {
 	CffontBlitxy(font, nameentry_moji, screen,
 			HIGHSCORE_MARK_X - nameentry_x * FONT_SIZE, HIGHSCORE_MARK_Y);
 	CBmpsBlit(cbmps_character, screen, 53, 0, 0);
 }
 
-int nameentry(void){
+void nameentry(void){
 
 	char buffer[4096];
-	Uint8 *keys;
 	char *scoreboard="NAME DEPTH   SCORE  TIME";
 
 
@@ -2298,11 +2211,10 @@ int nameentry(void){
 		if(keyread()){
 			strcpy(highscoredata.name[highscoretemp_entrynumber_score],"S.H");
 			strcpy(fasttimedata.name[highscoretemp_entrynumber_time],"S.H");
-			return 0;
-			}
+			break;
+		}
 		moveTilescroll();
 
-		keys = SDL_GetKeyState(NULL);
 		if(move_nameentry())break;
 		if(!gametime.isDelay){
 
@@ -2340,7 +2252,6 @@ int nameentry(void){
 }
 
 int highscore(void){
-	Uint8 *keys;
 	int i;
 	char buf[SCOREMEMBER][1024];
 	char buf_fast[SCOREMEMBER][1024];
@@ -2441,7 +2352,7 @@ void THighScoreSwap(THighScore *p,int i,int j){
 	p->depth[i]=depth;
 }
 
-int THighScoreSortByTime(THighScore *p){
+void THighScoreSortByTime(THighScore *p){
 	int i,j;
 
 	for(j=0;j<SCOREMEMBER;++j)
@@ -2450,7 +2361,7 @@ int THighScoreSortByTime(THighScore *p){
 	}
 
 }
-int THighScoreSortByDepth(THighScore *p){
+void THighScoreSortByDepth(THighScore *p){
 	int i,j;
 
 	for(j=0;j<SCOREMEMBER;++j)
@@ -2459,7 +2370,7 @@ int THighScoreSortByDepth(THighScore *p){
 	}
 
 }
-int THighScoreSortByScore(THighScore *p){
+void THighScoreSortByScore(THighScore *p){
 	int i,j;
 
 	for(j=0;j<SCOREMEMBER;++j)
@@ -2469,7 +2380,7 @@ int THighScoreSortByScore(THighScore *p){
 
 }
 
-int THighScoreAdd(THighScore *p,char *name,int time,int depth,int score){
+void THighScoreAdd(THighScore *p,char *name,int time,int depth,int score){
 
 	strcpy(p->name[SCOREMEMBER],name);
 	p->time[SCOREMEMBER]=time;
@@ -2501,13 +2412,11 @@ int THighScoreSave(THighScore *p,char *filename){
 	fclose(fp);
 	return 0;
 }
+
 int THighScoreLoad(THighScore *p,char *filename){
-
-
 	int i;
 	FILE *fp;
 	THighScore init={
-
 		{"ZEN","K.K","IKU","FKD","IWA","M.N","TT ","KOB","SAD","ADA","DUM"},
 		{100000,100000,100000,100000,100000,100000,100000,100000,100000,100000,100000},
 		{100,90,80,70,60,50,40,30,20,10,0},
@@ -2531,6 +2440,7 @@ int THighScoreLoad(THighScore *p,char *filename){
 
 	}
 	fclose(fp);
+	return 0;
 }
 
 
