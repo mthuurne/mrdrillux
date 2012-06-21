@@ -96,17 +96,11 @@ void CffontFree(Cffont *this){
 }
 
 
-int CffontBlitxy(Cffont *this,char *string,SDL_Surface *surf,int x,int y){
-	SDL_Rect src,dest;
-	while(*string!=0){
-		dest.x=x;
-		dest.y=y;
-		dest.w=this->width;
-		dest.h=this->height;
-		src=this->fontarea[(unsigned int)*string];
-		SDL_BlitSurface(this->font,&src,surf,&dest);
-		string++;
-		x+=this->width;
+void CffontBlitxy(Cffont *this,char *string,SDL_Surface *surf,int x,int y){
+	SDL_Rect dest = { x, y, this->width, this->height };
+	for (; *string; string++) {
+		SDL_Rect *psrc = &this->fontarea[(unsigned int)*string];
+		SDL_BlitSurface(this->font, psrc, surf, &dest);
+		dest.x += dest.w;
 	}
-	return(0);
 }
