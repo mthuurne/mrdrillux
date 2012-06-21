@@ -52,6 +52,7 @@ dist: $(BINARY)
 	mkdir -p $(OUTDIR)/dist/system/bmp
 	mkdir -p $(OUTDIR)/dist/system/wav
 	cp dat/* $(OUTDIR)/dist
+	cp gfx/icon.png $(OUTDIR)/dist
 	cp gfx/blockbg.txt gfx/charabg.txt gfx/otherbg.txt $(OUTDIR)/dist
 	cp gfx/player.txt $(OUTDIR)/dist/susumi
 	cp gfx/*.bmp $(OUTDIR)/dist
